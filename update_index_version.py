@@ -6,6 +6,16 @@ ROOT = Path(__file__).resolve().parent
 INDEX_FILE = ROOT / "index.html"
 
 
+def sync_index_to_latest_version(root: Path, index_path: Path):
+    version_files = sorted(root.glob("Score Calculator SVS v*.html"))
+    version = latest_version(version_files)
+    if version is None:
+        return False, None
+
+    changed = update_index(index_path, version)
+    return changed, version
+
+
 def parse_version(value: str):
     match = re.search(r"(\d+(?:\.\d+)+)", value)
     if not match:
@@ -54,13 +64,11 @@ def update_index(index_path: Path, version: str):
 
 
 def main():
-    version_files = sorted(ROOT.glob("Score Calculator SVS v*.html"))
-    version = latest_version(version_files)
+    changed, version = sync_index_to_latest_version(ROOT, INDEX_FILE)
     if version is None:
         print("Tidak ditemukan file versi yang sesuai.")
         return 1
 
-    changed = update_index(INDEX_FILE, version)
     print(f"Versi terbaru: {version}")
     print("index.html diperbarui." if changed else "index.html sudah menggunakan versi terbaru.")
     return 0
