@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SVS Championship — Kalkulator Skor v9.3.20</title>
+<style>
+  :root {
+    --gold: #E8B84B; --gold-light: #F5E6C4;
+    --text-primary: #F0E6D2; --text-secondary: #9C8C6A;
+    --card-bg: rgba(21,17,13,0.88); --card-border: #3A2F1F;
+    --input-bg: #0F0C09; --input-border: #4A3D28;
+    --neg: #D87856; --green: #4FD9A8; --red: #E07856;
+    --target-achieved: #4FD9A8;
+    --target-failed: #E07856;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: #050403 url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gIoSUNDX1BST0ZJTEUAAQEAAAIYAAAAAAQwAABtbnRyUkdCIFhZWiAAAAAAAAAAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAAHRyWFlaAAABZAAAABRnWFlaAAABeAAAABRiWFlaAAABjAAAABRyVFJDAAABoAAAAChnVFJDAAABoAAAAChiVFJDAAABoAAAACh3dHB0AAAByAAAABRjcHJ0AAAB3AAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAFgAAAAcAHMAUgBHAEIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFhZWiAAAAAAAABvogAAOPUAAAOQWFlaIAAAAAAAAGKZAAC3hQAAGNpYWVogAAAAAAAAJKAAAA+EAAC2z3BhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABYWVogAAAAAAAA9tYAAQAAAADTLW1sdWMAAAAAAAAAAQAAAAxlblVTAAAAIAAAABwARwBvAG8AZwBsAGUAIABJAG4AYwAuACAAMgAwADEANv/bAEMACAYGBwYFCAcHBwkJCAoMFA0MCwsMGRITDxQdGh8eHRocHCAkLicgIiwjHBwoNyksMDE0NDQfJzk9ODI8LjM0Mv/bAEMBCQkJDAsMGA0NGDIhHCEyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMv/AABEIBMYC0AMBIgACEQEDEQH/xAAcAAEAAgMBAQEAAAAAAAAAAAAABgcEBQgBAwL/xABgEAACAQMCBAMEAwgKDAoJBQEAAQIDBBEFBgcSITFBUWETInGBFDKRFSNCUqGxs8EIFiQzYnKCstHwFzZDZXR1kpSiwtLTGCY0N0VGVpPD4SVUVWNzg4SFlTVTZKPx/8QAGgEBAQEBAQEBAAAAAAAAAAAAAAECAwQFBv/EADQRAAICAgEDAgUCBAYCAwEAAAABAhEDEiExBEFREyIFYXGBMpGh0fAUQrHB4SMkUvFS/9oADAMBAAIRAxEAPwDn8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA [truncated]')
+    color: var(--text-primary);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0; padding: 12px 8px 40px;
+    min-height: 100vh; display: flex; justify-content: center;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0;
+    background: radial-gradient(ellipse at top, rgba(10,8,6,0.55) 0%, rgba(5,4,3,0.94) 70%);
+    z-index: 0; pointer-events: none;
+  }
+  .wrap { 
+    width: 100%; 
+    max-width: 100%; 
+    position: relative; 
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .spacer { height: 12px; grid-column: 1 / -1; }
+  .league-title { 
+    text-align: center; 
+    margin-bottom: 16px; 
+    grid-column: 1 / -1;
+    padding-right: 50px;
+  }
+  .league-title .main { font-size: 18px; font-weight: 700; color: var(--gold); letter-spacing: 0.06em; text-transform: uppercase; }
+  .league-title .sub { font-size: 11px; color: #B89456; margin-top: 4px; letter-spacing: 0.16em; text-transform: uppercase; }
+  .divider { width: 70px; height: 1px; background: linear-gradient(90deg,transparent,var(--gold),transparent); margin: 10px auto 0; }
+  .section-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 8px; font-weight: 600; }
+  .card { background: var(--card-bg); backdrop-filter: blur(6px); border: 1px solid var(--card-border); border-radius: 12px; padding: 14px 14px; margin-bottom: 10px; }
+  .row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .row:last-child { margin-bottom: 0; }
+  .row label { font-size: 14px; color: #B8AC92; min-width: 130px; flex-shrink: 0; }
+  .row input[type=number], .row input[type=text] { padding: 8px 10px; font-size: 14px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-primary); }
+  .row input[type=number] { width: 80px; }
+  .row input[type=text] { flex: 1; }
+  .row input:focus { outline: none; border-color: var(--gold); }
+  .row input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--gold); cursor: pointer; }
+  .pct-input { width: 60px !important; }
+  .pct-sign { color: var(--gold); font-weight: 700; }
+  .formula-hint { 
+    font-size: 10px; 
+    color: #7A6E54; 
+    margin: 0; 
+    display: block; 
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .mode-btn { 
+    padding: 10px 4px; 
+    font-size: 12px; 
+    font-weight: 700; 
+    border-radius: 8px; 
+    border: 1px solid var(--input-border); 
+    background: rgba(15,12,9,0.8); 
+    color: var(--text-secondary); 
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .mode-btn.active { background: linear-gradient(135deg,#B8862F,#E8B84B); border-color: var(--gold); color: #1A1410; box-shadow: 0 0 12px rgba(232,184,75,0.35); }
+  .subtoggle-btn { padding: 8px 4px; font-size: 11px; font-weight: 600; border-radius: 8px; border: 1px solid var(--input-border); background: rgba(15,12,9,0.6); color: var(--text-secondary); cursor: pointer; }
+  .subtoggle-btn.active { background: linear-gradient(135deg,#8a6a24,#c79b3c); border-color: var(--gold); color: #1A1410; }
+
+  /* Score Box */
+  .score-box { 
+    border-radius: 14px; 
+    padding: 18px 16px 16px; 
+    margin-bottom: 10px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 2px; 
+    background: linear-gradient(160deg,rgba(31,24,16,0.92),rgba(10,8,6,0.96)); 
+    border: 1px solid #5A4826; 
+  }
+  .score-team-name { font-size: 14px; font-weight: 700; color: var(--gold); text-align: center; }
+  .score-role-tag { font-size: 10px; color: #7A6E54; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 2px; }
+  .score-big { font-size: 44px; font-weight: 700; line-height: 1; margin: 4px 0; color: var(--gold-light); text-shadow: 0 0 20px rgba(232,184,75,0.35); }
+  .score-label { font-size: 11px; color: #7A6E54; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+
+  /* Target */
+  .target-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    width: 100%;
+    border-top: 1px solid #3A2F1F;
+    padding-top: 10px;
+    margin-top: 4px;
+  }
+  .target-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  .target-input {
+    width: 60px;
+    padding: 4px 6px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    text-align: center;
+  }
+  .target-input:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  .target-status {
+    font-size: 13px;
+    font-weight: 700;
+    min-height: 20px;
+    text-align: center;
+    margin-top: 2px;
+  }
+  .target-status.achieved {
+    color: var(--target-achieved);
+  }
+  .target-status.failed {
+    color: var(--target-failed);
+  }
+  .target-status.empty {
+    color: #5A4E3A;
+    font-weight: 400;
+    font-size: 12px;
+  }
+
+  /* Breakdown */
+  .breakdown-row { display: flex; justify-content: space-between; font-size: 12px; padding: 6px 0; border-bottom: 1px solid #2A2218; }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-row .key { color: #8A7C5E; }
+  .breakdown-row .val { font-weight: 600; color: var(--gold); }
+  .total-row { border-top: 1px solid #5A4826; margin-top: 4px; padding-top: 8px; }
+  .total-row .key { font-weight: 700; color: #E8D9B5; }
+  .total-row .val { font-size: 16px; color: var(--gold-light); }
+
+  /* Action buttons */
+  .action-grid { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 6px; 
+    margin-bottom: 10px; 
+    grid-column: 1 / -1; 
+  }
+  .action-btn { padding: 10px 6px; font-size: 12px; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .btn-save { background: linear-gradient(135deg,#1D7A5A,#2BAF85); color: #fff; }
+  .btn-copy { background: linear-gradient(135deg,#4A3D28,#6B5630); color: var(--gold); border: 1px solid var(--gold); }
+  .btn-pdf { background: linear-gradient(135deg,#3A1A1A,#8B3030); color: #FFC5C5; border: 1px solid #C05050; }
+  .btn-csv { background: linear-gradient(135deg,#1a3a5a,#2a6a9a); color: #fff; border: 1px solid #4a9ad0; }
+  .btn-clear-history { background: rgba(15,12,9,0.8); color: var(--text-secondary); border: 1px solid var(--input-border); font-size: 11px; }
+
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1D7A5A; color: #fff; padding: 8px 16px; border-radius: 16px; font-size: 12px; font-weight: 600; opacity: 0; transition: opacity 0.3s; z-index: 999; pointer-events: none; }
+  .toast.show { opacity: 1; }
+
+  /* Tabs */
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 10px; grid-column: 1 / -1; }
+  .tab-btn { flex: 1; padding: 8px 4px; font-size: 11px; font-weight: 700; border-radius: 8px; border: 1px solid var(--input-border); background: rgba(15,12,9,0.8); color: var(--text-secondary); cursor: pointer; text-align: center; }
+  .tab-btn.active { background: rgba(30,22,10,0.9); border-color: var(--gold); color: var(--gold); }
+  .tab-content { display: none; grid-column: 1 / -1; }
+  .tab-content.active { display: block; }
+
+  /* History */
+  .history-entry { background: rgba(15,12,9,0.8); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
+  .history-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+  .history-name { font-size: 13px; font-weight: 700; color: var(--gold); }
+  .history-score { font-size: 16px; font-weight: 700; color: var(--gold-light); }
+  .history-meta { font-size: 10px; color: var(--text-secondary); margin-bottom: 2px; }
+  .history-del { background: none; border: none; color: var(--neg); cursor: pointer; font-size: 12px; padding: 2px 4px; }
+  .match-label { font-size: 10px; font-weight: 700; color: #7A6E54; text-transform: uppercase; letter-spacing: 0.08em; margin: 10px 0 4px; }
+  .player-total { background: rgba(30,22,10,0.9); border: 1px solid #5A4826; border-radius: 8px; padding: 8px 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+  .player-total .name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .player-total .matches { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+  .player-total .score { font-size: 18px; font-weight: 700; color: var(--gold); }
+  .empty-state { text-align: center; color: var(--text-secondary); font-size: 12px; padding: 20px 0; }
+
+  footer { text-align: center; font-size: 10px; color: #6A5E48; margin-top: 16px; letter-spacing: 0.05em; grid-column: 1 / -1; }
+
+  /* Player card */
+  .player-card {
+    background: rgba(15,12,9,0.8);
+    border: 1px solid #3A2F1F;
+    border-radius: 10px;
+    padding: 12px 12px;
+    margin-bottom: 10px;
+  }
+  .player-card .player-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .player-card .player-name-input {
+    flex: 1;
+    min-width: 140px;
+    padding: 6px 10px;
+    font-size: 13px;
+    text-align: center;
+    border-radius: 6px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-primary);
+  }
+  .player-card .player-name-input:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  .player-card .role-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    margin: 6px 0 8px;
+  }
+  .player-card .role-btn {
+    padding: 6px 2px;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 6px;
+    border: 1px solid var(--input-border);
+    background: rgba(15,12,9,0.6);
+    color: var(--text-secondary);
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .player-card .role-btn.active {
+    background: linear-gradient(135deg,#B8862F,#E8B84B);
+    border-color: var(--gold);
+    color: #1A1410;
+  }
+  .player-card .stat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 4px;
+    align-items: center;
+  }
+  .player-card .stat-row label {
+    font-size: 12px;
+    color: #B8AC92;
+    min-width: 70px;
+  }
+  .player-card .stat-row input[type=number] {
+    width: 60px;
+    padding: 4px 6px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-primary);
+  }
+  .player-card .stat-row input[type=checkbox] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--gold);
+    cursor: pointer;
+  }
+  .player-card .stat-row .pct-input {
+    width: 50px !important;
+  }
+  .player-card .stat-row .pct-sign {
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 12px;
+  }
+  .player-card .player-score-small {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gold-light);
+    text-align: right;
+    min-width: 60px;
+    white-space: nowrap;
+  }
+
+  @media print {
+    body { background: #fff !important; padding: 0; }
+    body::before { display: none; }
+    .spacer, .action-grid, .tab-bar, footer, .card:first-child { display: none !important; }
+    .score-box, .card { border: 1px solid #ccc !important; background: #fff !important; color: #000 !important; }
+    .score-big, .score-team-name, .score-role-tag, .score-label, .breakdown-row .key, .breakdown-row .val, .total-row .key, .total-row .val { color: #000 !important; text-shadow: none !important; }
+    .tab-content { display: block !important; }
+  }
+
+  .lang-toggle { 
+    position: fixed; 
+    top: 10px; 
+    right: 10px; 
+    z-index: 50; 
+    display: flex; 
+    gap: 2px; 
+    background: rgba(15,12,9,0.9); 
+    border: 1px solid var(--input-border); 
+    border-radius: 14px; 
+    padding: 2px 4px; 
+  }
+  .lang-btn { 
+    padding: 3px 8px; 
+    font-size: 10px; 
+    font-weight: 700; 
+    border-radius: 12px; 
+    border: none; 
+    background: transparent; 
+    color: var(--text-secondary); 
+    cursor: pointer; 
+  }
+  .lang-btn.active { background: linear-gradient(135deg,#B8862F,#E8B84B); color: #1A1410; }
+  @media print { .lang-toggle { display: none !important; } }
+
+  /* ====== LAYOUT DUA KOLOM ====== */
+  .input-area { grid-column: 1 / -1; }
+  .result-area { grid-column: 1 / -1; }
+
+  @media (min-width: 768px) {
+    .wrap { max-width: 900px; }
+    .input-area { grid-column: 1 / 2; }
+    .result-area { grid-column: 2 / 3; }
+    .row label { min-width: 150px; font-size: 13px; }
+    .score-big { font-size: 56px; }
+    .card { padding: 14px 16px; }
+    .result-area .card { margin-left: 16px; }
+    .input-area .card { margin-right: 16px; }
+
+    .wrap .section-label,
+    .wrap .action-grid,
+    .wrap .tab-bar,
+    .wrap .tab-content,
+    .wrap .tab-content .card,
+    .wrap .tab-content .empty-state,
+    .wrap .tab-content .history-entry,
+    .wrap .tab-content .match-label,
+    .wrap .tab-content .player-total,
+    .wrap footer {
+      grid-column: 1 / -1 !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="lang-toggle">
+  <button class="lang-btn active" id="lang-id" onclick="setLang('id')">ID</button>
+  <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
+</div>
+
+<div class="wrap">
+  <div class="spacer"></div>
+  <div class="league-title">
+    <div class="main">Svarga Synergy E-Sports</div>
+    <div class="sub"><span data-i18n="subtitle">SVS Championship — Kalkulator Skor Player</span></div>
+    <div class="divider"></div>
+  </div>
+
+  <!-- Identitas Tim -->
+  <div class="card" style="grid-column:1/-1;">
+    <p class="section-label" data-i18n="identity_title">Identitas Tim</p>
+    <div class="row"><label data-i18n="team">Tim</label><input type="text" id="team_name" placeholder="IMP / NYX / SS" data-i18n-placeholder="team_ph"></div>
+    <div class="row">
+      <label data-i18n="match">Match</label>
+      <input type="number" id="match_num" min="1" max="20" style="width:60px;">
+      <span style="color:var(--text-secondary);font-size:12px;" data-i18n="match_suffix">Match ke-</span>
+    </div>
+  </div>
+
+  <!-- 5 Player Cards -->
+  <p class="section-label" style="grid-column:1/-1;" data-i18n="lineup">Lineup Tim</p>
+
+  <div id="player-cards-container" style="grid-column:1/-1;">
+
+    <!-- Player 1 -->
+    <div class="player-card" data-player="1">
+      <div class="player-header">
+        <input type="text" class="player-name-input" id="p1_name" name="p1_name" placeholder="🎮 Nama Player" data-i18n-placeholder="player_name_ph">
+        <span class="player-score-small" id="p1-total">0</span>
+      </div>
+      <div class="role-grid">
+        <button class="role-btn active" data-player="1" data-role="exp" onclick="setPlayerRole(1,'exp')" data-i18n="exp_lane">Exp</button>
+        <button class="role-btn" data-player="1" data-role="gold" onclick="setPlayerRole(1,'gold')" data-i18n="gold_lane">Gold</button>
+        <button class="role-btn" data-player="1" data-role="mid" onclick="setPlayerRole(1,'mid')" data-i18n="mid_lane">Mid</button>
+        <button class="role-btn" data-player="1" data-role="jungler" onclick="setPlayerRole(1,'jungler')" data-i18n="jungler_lane">Jungler</button>
+        <button class="role-btn" data-player="1" data-role="roamer" onclick="setPlayerRole(1,'roamer')" data-i18n="roamer_lane">Roam</button>
+      </div>
+      <div class="subtoggle" style="display:none;" id="p1-jg-toggle-row">
+        <button class="subtoggle-btn active" data-player="1" data-jgtype="tank" onclick="setJunglerType(1,'tank')" data-i18n="tank_fighter">Tank</button>
+        <button class="subtoggle-btn" data-player="1" data-jgtype="other" onclick="setJunglerType(1,'other')" data-i18n="others">Lain</button>
+      </div>
+      <div class="stat-row"><label for="p1_kill" data-i18n="kill_label">⚔️ Kill (+3)</label><input type="number" class="p1-stat" data-stat="kill" min="0" id="p1_kill" name="p1_kill" oninput="calc()"><span class="formula-hint" data-i18n="kill_hint"></span></div>
+      <div class="stat-row"><label for="p1_death" data-i18n="death_label">💀 Death (-1)</label><input type="number" class="p1-stat" data-stat="death" min="0" id="p1_death" name="p1_death" oninput="calc()"><span class="formula-hint" data-i18n="death_hint"></span></div>
+      <div class="stat-row"><label for="p1_assist" data-i18n="assist_label">🤝 Assist (+2)</label><input type="number" class="p1-stat" data-stat="assist" min="0" id="p1_assist" name="p1_assist" oninput="calc()"><span class="formula-hint" data-i18n="assist_hint"></span></div>
+      <div class="stat-row" id="p1-dmg-dealt-row"><label for="p1_dmgDealt" data-i18n="dmg_dealt_label">🔥 Hero Damage</label><input type="number" class="p1-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" id="p1_dmgDealt" name="p1_dmgDealt" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_dealt_hint"></span></div>
+      <div class="stat-row" id="p1-roam-dmg-row" style="display:none;"><label for="p1_roamDmg" data-i18n="roam_dmg_label">🔥 Roam Damage tertinggi?</label><input type="checkbox" class="p1-stat" data-stat="roamDmg" id="p1_roamDmg" name="p1_roamDmg" onchange="calc()"><span class="formula-hint" data-i18n="roam_dmg_hint"></span></div>
+      <div class="stat-row" id="p1-turret-row"><label for="p1_turretDmg" data-i18n="turret_label">🏯 Damage Turret</label><input type="number" class="p1-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" id="p1_turretDmg" name="p1_turretDmg" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="turret_hint"></span></div>
+      <div class="stat-row" id="p1-dmg-taken-row"><label for="p1_dmgTaken" data-i18n="dmg_taken_label">🛡️ Damage Diterima</label><input type="number" class="p1-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" id="p1_dmgTaken" name="p1_dmgTaken" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_taken_hint_normal"></span></div>
+      <div class="stat-row" id="p1-tfp-row"><label for="p1_tfp" data-i18n="tfp_label">👥 Partisipasi Teamfight</label><input type="number" class="p1-stat pct-input" data-stat="tfp" min="0" max="100" step="1" id="p1_tfp" name="p1_tfp" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" id="p1-tfp-hint" data-i18n="tfp_hint_normal"></span></div>
+      <div class="stat-row" id="p1-turtle-row" style="display:none;"><label for="p1_turtle" data-i18n="turtle_label">🐢 Bunuh 3+ Turtle?</label><input type="checkbox" class="p1-stat" data-stat="turtle" id="p1_turtle" name="p1_turtle" onchange="calc()"><span class="formula-hint" data-i18n="turtle_hint"></span></div>
+      <div class="stat-row" id="p1-savage-row" style="display:none;"><label for="p1_savage" data-i18n="savage_label">💀 Dapat Savage?</label><input type="checkbox" class="p1-stat" data-stat="savage" id="p1_savage" name="p1_savage" onchange="calc()"><span class="formula-hint" data-i18n="savage_hint"></span></div>
+      <div class="stat-row"><label for="p1_mvp" data-i18n="mvp_label">🏅 Dapat MVP?</label><input type="checkbox" class="p1-stat" data-stat="mvp" id="p1_mvp" name="p1_mvp" onchange="calc()"><span class="formula-hint" data-i18n="mvp_hint"></span></div>
+    </div>
+
+    <!-- Player 2 -->
+    <div class="player-card" data-player="2">
+      <div class="player-header">
+        <input type="text" class="player-name-input" id="p2_name" name="p2_name" placeholder="🎮 Nama Player" data-i18n-placeholder="player_name_ph">
+        <span class="player-score-small" id="p2-total">0</span>
+      </div>
+      <div class="role-grid">
+        <button class="role-btn active" data-player="2" data-role="exp" onclick="setPlayerRole(2,'exp')" data-i18n="exp_lane">Exp</button>
+        <button class="role-btn" data-player="2" data-role="gold" onclick="setPlayerRole(2,'gold')" data-i18n="gold_lane">Gold</button>
+        <button class="role-btn" data-player="2" data-role="mid" onclick="setPlayerRole(2,'mid')" data-i18n="mid_lane">Mid</button>
+        <button class="role-btn" data-player="2" data-role="jungler" onclick="setPlayerRole(2,'jungler')" data-i18n="jungler_lane">Jungler</button>
+        <button class="role-btn" data-player="2" data-role="roamer" onclick="setPlayerRole(2,'roamer')" data-i18n="roamer_lane">Roam</button>
+      </div>
+      <div class="subtoggle" style="display:none;" id="p2-jg-toggle-row">
+        <button class="subtoggle-btn active" data-player="2" data-jgtype="tank" onclick="setJunglerType(2,'tank')" data-i18n="tank_fighter">Tank</button>
+        <button class="subtoggle-btn" data-player="2" data-jgtype="other" onclick="setJunglerType(2,'other')" data-i18n="others">Lain</button>
+      </div>
+      <div class="stat-row"><label for="p2_kill" data-i18n="kill_label">⚔️ Kill (+3)</label><input type="number" class="p2-stat" data-stat="kill" min="0" id="p2_kill" name="p2_kill" oninput="calc()"><span class="formula-hint" data-i18n="kill_hint"></span></div>
+      <div class="stat-row"><label for="p2_death" data-i18n="death_label">💀 Death (-1)</label><input type="number" class="p2-stat" data-stat="death" min="0" id="p2_death" name="p2_death" oninput="calc()"><span class="formula-hint" data-i18n="death_hint"></span></div>
+      <div class="stat-row"><label for="p2_assist" data-i18n="assist_label">🤝 Assist (+2)</label><input type="number" class="p2-stat" data-stat="assist" min="0" id="p2_assist" name="p2_assist" oninput="calc()"><span class="formula-hint" data-i18n="assist_hint"></span></div>
+      <div class="stat-row" id="p2-dmg-dealt-row"><label for="p2_dmgDealt" data-i18n="dmg_dealt_label">🔥 Hero Damage</label><input type="number" class="p2-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" id="p2_dmgDealt" name="p2_dmgDealt" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_dealt_hint"></span></div>
+      <div class="stat-row" id="p2-roam-dmg-row" style="display:none;"><label for="p2_roamDmg" data-i18n="roam_dmg_label">🔥 Roam Damage tertinggi?</label><input type="checkbox" class="p2-stat" data-stat="roamDmg" id="p2_roamDmg" name="p2_roamDmg" onchange="calc()"><span class="formula-hint" data-i18n="roam_dmg_hint"></span></div>
+      <div class="stat-row" id="p2-turret-row"><label for="p2_turretDmg" data-i18n="turret_label">🏯 Damage Turret</label><input type="number" class="p2-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" id="p2_turretDmg" name="p2_turretDmg" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="turret_hint"></span></div>
+      <div class="stat-row" id="p2-dmg-taken-row"><label for="p2_dmgTaken" data-i18n="dmg_taken_label">🛡️ Damage Diterima</label><input type="number" class="p2-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" id="p2_dmgTaken" name="p2_dmgTaken" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_taken_hint_normal"></span></div>
+      <div class="stat-row" id="p2-tfp-row"><label for="p2_tfp" data-i18n="tfp_label">👥 Partisipasi Teamfight</label><input type="number" class="p2-stat pct-input" data-stat="tfp" min="0" max="100" step="1" id="p2_tfp" name="p2_tfp" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" id="p2-tfp-hint" data-i18n="tfp_hint_normal"></span></div>
+      <div class="stat-row" id="p2-turtle-row" style="display:none;"><label for="p2_turtle" data-i18n="turtle_label">🐢 Bunuh 3+ Turtle?</label><input type="checkbox" class="p2-stat" data-stat="turtle" id="p2_turtle" name="p2_turtle" onchange="calc()"><span class="formula-hint" data-i18n="turtle_hint"></span></div>
+      <div class="stat-row" id="p2-savage-row" style="display:none;"><label for="p2_savage" data-i18n="savage_label">💀 Dapat Savage?</label><input type="checkbox" class="p2-stat" data-stat="savage" id="p2_savage" name="p2_savage" onchange="calc()"><span class="formula-hint" data-i18n="savage_hint"></span></div>
+      <div class="stat-row"><label for="p2_mvp" data-i18n="mvp_label">🏅 Dapat MVP?</label><input type="checkbox" class="p2-stat" data-stat="mvp" id="p2_mvp" name="p2_mvp" onchange="calc()"><span class="formula-hint" data-i18n="mvp_hint"></span></div>
+    </div>
+
+    <!-- Player 3 -->
+    <div class="player-card" data-player="3">
+      <div class="player-header">
+        <input type="text" class="player-name-input" id="p3_name" name="p3_name" placeholder="🎮 Nama Player" data-i18n-placeholder="player_name_ph">
+        <span class="player-score-small" id="p3-total">0</span>
+      </div>
+      <div class="role-grid">
+        <button class="role-btn active" data-player="3" data-role="exp" onclick="setPlayerRole(3,'exp')" data-i18n="exp_lane">Exp</button>
+        <button class="role-btn" data-player="3" data-role="gold" onclick="setPlayerRole(3,'gold')" data-i18n="gold_lane">Gold</button>
+        <button class="role-btn" data-player="3" data-role="mid" onclick="setPlayerRole(3,'mid')" data-i18n="mid_lane">Mid</button>
+        <button class="role-btn" data-player="3" data-role="jungler" onclick="setPlayerRole(3,'jungler')" data-i18n="jungler_lane">Jungler</button>
+        <button class="role-btn" data-player="3" data-role="roamer" onclick="setPlayerRole(3,'roamer')" data-i18n="roamer_lane">Roam</button>
+      </div>
+      <div class="subtoggle" style="display:none;" id="p3-jg-toggle-row">
+        <button class="subtoggle-btn active" data-player="3" data-jgtype="tank" onclick="setJunglerType(3,'tank')" data-i18n="tank_fighter">Tank</button>
+        <button class="subtoggle-btn" data-player="3" data-jgtype="other" onclick="setJunglerType(3,'other')" data-i18n="others">Lain</button>
+      </div>
+      <div class="stat-row"><label for="p3_kill" data-i18n="kill_label">⚔️ Kill (+3)</label><input type="number" class="p3-stat" data-stat="kill" min="0" id="p3_kill" name="p3_kill" oninput="calc()"><span class="formula-hint" data-i18n="kill_hint"></span></div>
+      <div class="stat-row"><label for="p3_death" data-i18n="death_label">💀 Death (-1)</label><input type="number" class="p3-stat" data-stat="death" min="0" id="p3_death" name="p3_death" oninput="calc()"><span class="formula-hint" data-i18n="death_hint"></span></div>
+      <div class="stat-row"><label for="p3_assist" data-i18n="assist_label">🤝 Assist (+2)</label><input type="number" class="p3-stat" data-stat="assist" min="0" id="p3_assist" name="p3_assist" oninput="calc()"><span class="formula-hint" data-i18n="assist_hint"></span></div>
+      <div class="stat-row" id="p3-dmg-dealt-row"><label for="p3_dmgDealt" data-i18n="dmg_dealt_label">🔥 Hero Damage</label><input type="number" class="p3-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" id="p3_dmgDealt" name="p3_dmgDealt" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_dealt_hint"></span></div>
+      <div class="stat-row" id="p3-roam-dmg-row" style="display:none;"><label for="p3_roamDmg" data-i18n="roam_dmg_label">🔥 Roam Damage tertinggi?</label><input type="checkbox" class="p3-stat" data-stat="roamDmg" id="p3_roamDmg" name="p3_roamDmg" onchange="calc()"><span class="formula-hint" data-i18n="roam_dmg_hint"></span></div>
+      <div class="stat-row" id="p3-turret-row"><label for="p3_turretDmg" data-i18n="turret_label">🏯 Damage Turret</label><input type="number" class="p3-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" id="p3_turretDmg" name="p3_turretDmg" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="turret_hint"></span></div>
+      <div class="stat-row" id="p3-dmg-taken-row"><label for="p3_dmgTaken" data-i18n="dmg_taken_label">🛡️ Damage Diterima</label><input type="number" class="p3-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" id="p3_dmgTaken" name="p3_dmgTaken" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_taken_hint_normal"></span></div>
+      <div class="stat-row" id="p3-tfp-row"><label for="p3_tfp" data-i18n="tfp_label">👥 Partisipasi Teamfight</label><input type="number" class="p3-stat pct-input" data-stat="tfp" min="0" max="100" step="1" id="p3_tfp" name="p3_tfp" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" id="p3-tfp-hint" data-i18n="tfp_hint_normal"></span></div>
+      <div class="stat-row" id="p3-turtle-row" style="display:none;"><label for="p3_turtle" data-i18n="turtle_label">🐢 Bunuh 3+ Turtle?</label><input type="checkbox" class="p3-stat" data-stat="turtle" id="p3_turtle" name="p3_turtle" onchange="calc()"><span class="formula-hint" data-i18n="turtle_hint"></span></div>
+      <div class="stat-row" id="p3-savage-row" style="display:none;"><label for="p3_savage" data-i18n="savage_label">💀 Dapat Savage?</label><input type="checkbox" class="p3-stat" data-stat="savage" id="p3_savage" name="p3_savage" onchange="calc()"><span class="formula-hint" data-i18n="savage_hint"></span></div>
+      <div class="stat-row"><label for="p3_mvp" data-i18n="mvp_label">🏅 Dapat MVP?</label><input type="checkbox" class="p3-stat" data-stat="mvp" id="p3_mvp" name="p3_mvp" onchange="calc()"><span class="formula-hint" data-i18n="mvp_hint"></span></div>
+    </div>
+
+    <!-- Player 4 -->
+    <div class="player-card" data-player="4">
+      <div class="player-header">
+        <input type="text" class="player-name-input" id="p4_name" name="p4_name" placeholder="🎮 Nama Player" data-i18n-placeholder="player_name_ph">
+        <span class="player-score-small" id="p4-total">0</span>
+      </div>
+      <div class="role-grid">
+        <button class="role-btn active" data-player="4" data-role="exp" onclick="setPlayerRole(4,'exp')" data-i18n="exp_lane">Exp</button>
+        <button class="role-btn" data-player="4" data-role="gold" onclick="setPlayerRole(4,'gold')" data-i18n="gold_lane">Gold</button>
+        <button class="role-btn" data-player="4" data-role="mid" onclick="setPlayerRole(4,'mid')" data-i18n="mid_lane">Mid</button>
+        <button class="role-btn" data-player="4" data-role="jungler" onclick="setPlayerRole(4,'jungler')" data-i18n="jungler_lane">Jungler</button>
+        <button class="role-btn" data-player="4" data-role="roamer" onclick="setPlayerRole(4,'roamer')" data-i18n="roamer_lane">Roam</button>
+      </div>
+      <div class="subtoggle" style="display:none;" id="p4-jg-toggle-row">
+        <button class="subtoggle-btn active" data-player="4" data-jgtype="tank" onclick="setJunglerType(4,'tank')" data-i18n="tank_fighter">Tank</button>
+        <button class="subtoggle-btn" data-player="4" data-jgtype="other" onclick="setJunglerType(4,'other')" data-i18n="others">Lain</button>
+      </div>
+      <div class="stat-row"><label for="p4_kill" data-i18n="kill_label">⚔️ Kill (+3)</label><input type="number" class="p4-stat" data-stat="kill" min="0" id="p4_kill" name="p4_kill" oninput="calc()"><span class="formula-hint" data-i18n="kill_hint"></span></div>
+      <div class="stat-row"><label for="p4_death" data-i18n="death_label">💀 Death (-1)</label><input type="number" class="p4-stat" data-stat="death" min="0" id="p4_death" name="p4_death" oninput="calc()"><span class="formula-hint" data-i18n="death_hint"></span></div>
+      <div class="stat-row"><label for="p4_assist" data-i18n="assist_label">🤝 Assist (+2)</label><input type="number" class="p4-stat" data-stat="assist" min="0" id="p4_assist" name="p4_assist" oninput="calc()"><span class="formula-hint" data-i18n="assist_hint"></span></div>
+      <div class="stat-row" id="p4-dmg-dealt-row"><label for="p4_dmgDealt" data-i18n="dmg_dealt_label">🔥 Hero Damage</label><input type="number" class="p4-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" id="p4_dmgDealt" name="p4_dmgDealt" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_dealt_hint"></span></div>
+      <div class="stat-row" id="p4-roam-dmg-row" style="display:none;"><label for="p4_roamDmg" data-i18n="roam_dmg_label">🔥 Roam Damage tertinggi?</label><input type="checkbox" class="p4-stat" data-stat="roamDmg" id="p4_roamDmg" name="p4_roamDmg" onchange="calc()"><span class="formula-hint" data-i18n="roam_dmg_hint"></span></div>
+      <div class="stat-row" id="p4-turret-row"><label for="p4_turretDmg" data-i18n="turret_label">🏯 Damage Turret</label><input type="number" class="p4-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" id="p4_turretDmg" name="p4_turretDmg" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="turret_hint"></span></div>
+      <div class="stat-row" id="p4-dmg-taken-row"><label for="p4_dmgTaken" data-i18n="dmg_taken_label">🛡️ Damage Diterima</label><input type="number" class="p4-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" id="p4_dmgTaken" name="p4_dmgTaken" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_taken_hint_normal"></span></div>
+      <div class="stat-row" id="p4-tfp-row"><label for="p4_tfp" data-i18n="tfp_label">👥 Partisipasi Teamfight</label><input type="number" class="p4-stat pct-input" data-stat="tfp" min="0" max="100" step="1" id="p4_tfp" name="p4_tfp" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" id="p4-tfp-hint" data-i18n="tfp_hint_normal"></span></div>
+      <div class="stat-row" id="p4-turtle-row" style="display:none;"><label for="p4_turtle" data-i18n="turtle_label">🐢 Bunuh 3+ Turtle?</label><input type="checkbox" class="p4-stat" data-stat="turtle" id="p4_turtle" name="p4_turtle" onchange="calc()"><span class="formula-hint" data-i18n="turtle_hint"></span></div>
+      <div class="stat-row" id="p4-savage-row" style="display:none;"><label for="p4_savage" data-i18n="savage_label">💀 Dapat Savage?</label><input type="checkbox" class="p4-stat" data-stat="savage" id="p4_savage" name="p4_savage" onchange="calc()"><span class="formula-hint" data-i18n="savage_hint"></span></div>
+      <div class="stat-row"><label for="p4_mvp" data-i18n="mvp_label">🏅 Dapat MVP?</label><input type="checkbox" class="p4-stat" data-stat="mvp" id="p4_mvp" name="p4_mvp" onchange="calc()"><span class="formula-hint" data-i18n="mvp_hint"></span></div>
+    </div>
+
+    <!-- Player 5 -->
+    <div class="player-card" data-player="5">
+      <div class="player-header">
+        <input type="text" class="player-name-input" id="p5_name" name="p5_name" placeholder="🎮 Nama Player" data-i18n-placeholder="player_name_ph">
+        <span class="player-score-small" id="p5-total">0</span>
+      </div>
+      <div class="role-grid">
+        <button class="role-btn active" data-player="5" data-role="exp" onclick="setPlayerRole(5,'exp')" data-i18n="exp_lane">Exp</button>
+        <button class="role-btn" data-player="5" data-role="gold" onclick="setPlayerRole(5,'gold')" data-i18n="gold_lane">Gold</button>
+        <button class="role-btn" data-player="5" data-role="mid" onclick="setPlayerRole(5,'mid')" data-i18n="mid_lane">Mid</button>
+        <button class="role-btn" data-player="5" data-role="jungler" onclick="setPlayerRole(5,'jungler')" data-i18n="jungler_lane">Jungler</button>
+        <button class="role-btn" data-player="5" data-role="roamer" onclick="setPlayerRole(5,'roamer')" data-i18n="roamer_lane">Roam</button>
+      </div>
+      <div class="subtoggle" style="display:none;" id="p5-jg-toggle-row">
+        <button class="subtoggle-btn active" data-player="5" data-jgtype="tank" onclick="setJunglerType(5,'tank')" data-i18n="tank_fighter">Tank</button>
+        <button class="subtoggle-btn" data-player="5" data-jgtype="other" onclick="setJunglerType(5,'other')" data-i18n="others">Lain</button>
+      </div>
+      <div class="stat-row"><label for="p5_kill" data-i18n="kill_label">⚔️ Kill (+3)</label><input type="number" class="p5-stat" data-stat="kill" min="0" id="p5_kill" name="p5_kill" oninput="calc()"><span class="formula-hint" data-i18n="kill_hint"></span></div>
+      <div class="stat-row"><label for="p5_death" data-i18n="death_label">💀 Death (-1)</label><input type="number" class="p5-stat" data-stat="death" min="0" id="p5_death" name="p5_death" oninput="calc()"><span class="formula-hint" data-i18n="death_hint"></span></div>
+      <div class="stat-row"><label for="p5_assist" data-i18n="assist_label">🤝 Assist (+2)</label><input type="number" class="p5-stat" data-stat="assist" min="0" id="p5_assist" name="p5_assist" oninput="calc()"><span class="formula-hint" data-i18n="assist_hint"></span></div>
+      <div class="stat-row" id="p5-dmg-dealt-row"><label for="p5_dmgDealt" data-i18n="dmg_dealt_label">🔥 Hero Damage</label><input type="number" class="p5-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" id="p5_dmgDealt" name="p5_dmgDealt" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_dealt_hint"></span></div>
+      <div class="stat-row" id="p5-roam-dmg-row" style="display:none;"><label for="p5_roamDmg" data-i18n="roam_dmg_label">🔥 Roam Damage tertinggi?</label><input type="checkbox" class="p5-stat" data-stat="roamDmg" id="p5_roamDmg" name="p5_roamDmg" onchange="calc()"><span class="formula-hint" data-i18n="roam_dmg_hint"></span></div>
+      <div class="stat-row" id="p5-turret-row"><label for="p5_turretDmg" data-i18n="turret_label">🏯 Damage Turret</label><input type="number" class="p5-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" id="p5_turretDmg" name="p5_turretDmg" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="turret_hint"></span></div>
+      <div class="stat-row" id="p5-dmg-taken-row"><label for="p5_dmgTaken" data-i18n="dmg_taken_label">🛡️ Damage Diterima</label><input type="number" class="p5-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" id="p5_dmgTaken" name="p5_dmgTaken" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_taken_hint_normal"></span></div>
+      <div class="stat-row" id="p5-tfp-row"><label for="p5_tfp" data-i18n="tfp_label">👥 Partisipasi Teamfight</label><input type="number" class="p5-stat pct-input" data-stat="tfp" min="0" max="100" step="1" id="p5_tfp" name="p5_tfp" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" id="p5-tfp-hint" data-i18n="tfp_hint_normal"></span></div>
+      <div class="stat-row" id="p5-turtle-row" style="display:none;"><label for="p5_turtle" data-i18n="turtle_label">🐢 Bunuh 3+ Turtle?</label><input type="checkbox" class="p5-stat" data-stat="turtle" id="p5_turtle" name="p5_turtle" onchange="calc()"><span class="formula-hint" data-i18n="turtle_hint"></span></div>
+      <div class="stat-row" id="p5-savage-row" style="display:none;"><label for="p5_savage" data-i18n="savage_label">💀 Dapat Savage?</label><input type="checkbox" class="p5-stat" data-stat="savage" id="p5_savage" name="p5_savage" onchange="calc()"><span class="formula-hint" data-i18n="savage_hint"></span></div>
+      <div class="stat-row"><label for="p5_mvp" data-i18n="mvp_label">🏅 Dapat MVP?</label><input type="checkbox" class="p5-stat" data-stat="mvp" id="p5_mvp" name="p5_mvp" onchange="calc()"><span class="formula-hint" data-i18n="mvp_hint"></span></div>
+    </div>
+  </div>
+
+  <!-- Result Area -->
+  <div class="card result-area">
+    <p class="section-label" data-i18n="total_score">Total Tim</p>
+    <div class="score-box">
+      <div class="score-team-name" id="team-label">TEAM</div>
+      <div class="score-role-tag" id="match-label">MATCH 1</div>
+      <div class="score-big" id="total-team-score">0</div>
+      <div class="score-label" data-i18n="total_score">Total Tim</div>
+    </div>
+
+    <div class="target-row">
+      <label class="target-label" for="target_score" data-i18n="target_label">🎯 Target</label>
+      <input type="number" class="target-input" id="target_score" min="0" step="0.5" oninput="calc(); saveTargetPerTeam();" placeholder="0">
+      <span class="target-status empty" id="target-status" data-i18n="target_hint">Masukkan target</span>
+    </div>
+
+    <div class="card" style="margin-top:10px;padding:10px;">
+      <p class="section-label" data-i18n="breakdown_title">Rincian Poin Tim</p>
+      <div id="breakdown-players"></div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="action-grid">
+    <button class="action-btn btn-save" onclick="saveEntry()" data-i18n="save_btn">💾 Simpan Tim</button>
+    <button class="action-btn btn-copy" onclick="copyToClipboard()" data-i18n="copy_btn">📋 Salin Detail</button>
+    <button class="action-btn btn-pdf" onclick="window.print()" data-i18n="pdf_btn">📄 Export PDF</button>
+    <button class="action-btn btn-csv" onclick="exportCSV()" data-i18n="export_csv_btn">📊 Export CSV</button>
+    <button class="action-btn btn-clear-history" onclick="clearAllHistory()" data-i18n="clear_btn">🗑️ Hapus Semua Riwayat</button>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('tab-match', event)" data-i18n="per_match">Per Match</button>
+    <button class="tab-btn" onclick="switchTab('tab-player', event)" data-i18n="per_player">Per Player</button>
+  </div>
+
+  <div id="tab-match" class="tab-content active">
+    <div id="history-match-list"><div class="empty-state" data-i18n="empty_state">Belum ada data tersimpan.</div></div>
+  </div>
+  <div id="tab-player" class="tab-content">
+    <div id="history-player-list"><div class="empty-state" data-i18n="empty_state">Belum ada data tersimpan.</div></div>
+  </div>
+
+  <footer>SVARGA SYNERGY E-SPORTS &middot; SVS CHAMPIONSHIP &middot; V9.3.19</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── I18N ──────────────────────────────────────────────────────────────────────
+let currentLang = 'id';
+
+const I18N = {
+  id: {
+    subtitle: 'SVS Championship — Kalkulator Skor Player',
+    identity_title: 'Identitas Tim',
+    team: 'Tim',
+    team_ph: 'IMP / NYX / SS',
+    match: 'Match',
+    match_suffix: 'Match ke-',
+    lane_role: 'Lane / Role',
+    lineup: 'Lineup Tim',
+    player_name_ph: '🎮 Nama Player',
+    exp_lane: 'Exp', gold_lane: 'Gold', mid_lane: 'Mid', jungler_lane: 'Jungler', roamer_lane: 'Roam',
+    kda: 'KDA',
+    kill_label: '⚔️ Kill',
+    death_label: '💀 Death',
+    assist_label: '🤝 Assist',
+    kill_hint: 'Eliminasi hero lawan',
+    death_hint: 'Kematian dalam match',
+    assist_hint: 'Bantuan eliminasi lawan',
+    dmg_dealt_title: 'Hero Damage (%)',
+    dmg_dealt_label: '🔥 Hero Damage',
+    dmg_dealt_hint: '% kontribusi dari total hero damage tim',
+    roam_dmg_title: 'Roam Damage (+2)',
+    roam_dmg_label: '🔥 Roam Damage tertinggi?',
+    roam_dmg_hint: 'Centang jika roamer ini damage tertinggi di tim',
+    dmg_taken_title: 'Damage Diterima (%)',
+    dmg_taken_label: '🛡️ Damage Diterima',
+    dmg_taken_hint_normal: '% kontribusi dari total damage taken tim',
+    jungler_type: 'Tipe Jungler', tank_fighter: 'Tank', others: 'Lain',
+    jungler_dmg_hint: 'Damage Taken (+3) hanya untuk Jungler Tank/Fighter',
+    turret_title: 'Damage Turret (%)',
+    turret_label: '🏯 Damage Turret',
+    turret_hint: '% kontribusi dari total turret damage tim',
+    turtle_title: 'Turtle Slayer 3x (+2)', turtle_label: '🐢 Bunuh 3+ Turtle?', turtle_hint: 'Centang jika jungler bunuh Turtle ≥ 3 kali',
+    tfp_title: 'Partisipasi Teamfight (%)',
+    tfp_label: '👥 Partisipasi Teamfight',
+    tfp_hint_bonus: '⚡ Bonus TFP ≥ 80% (+5 otomatis)',
+    tfp_hint_normal: '% teamfight yang diikuti dari total teamfight tim',
+    savage_title: 'Savage (+5)', savage_label: '💀 Dapat Savage?', savage_hint: 'Centang jika player dapat Savage di match ini',
+    mvp_title: 'MVP (+5)',
+    mvp_label: '🏅 Dapat MVP?',
+    mvp_hint: 'Centang jika player terpilih sebagai MVP',
+    total_score: 'Total Tim',
+    target_label: '🎯 Target',
+    target_hint: 'Masukkan target skor',
+    target_achieved: '✅ Target Tercapai!',
+    target_not_achieved: '❌ Target Belum Tercapai',
+    breakdown_title: 'Rincian Poin Tim',
+    total: 'Total',
+    save_btn: '💾 Simpan Tim', copy_btn: '📋 Salin Detail', pdf_btn: '📄 Export PDF', export_csv_btn: '📊 Export CSV', clear_btn: '🗑️ Hapus Semua Riwayat',
+    history_title: 'Riwayat Skor', per_match: 'Per Match', per_player: 'Per Player',
+    empty_state: 'Belum ada data tersimpan.',
+    role_labels: { exp:'EXP LANE', gold:'GOLD LANE', mid:'MID LANE', jungler:'JUNGLER', roamer:'ROAMER' },
+    toast_saved: '✅ Tim disimpan!', toast_copied: '📋 Disalin ke clipboard!', toast_cleared: '🗑️ Riwayat dihapus', toast_no_data: '⚠️ Isi data terlebih dahulu', toast_empty_name: '⚠️ Semua player harus diisi nama', toast_no_export: '⚠️ Tidak ada data untuk diekspor', toast_no_copy_data: '⚠️ Tidak ada data untuk disalin',
+    toast_csv_exported: '📊 CSV berhasil diekspor!',
+    confirm_clear: 'Hapus semua riwayat skor?',
+    confirm_dup_role: 'Ada role yang sama dipakai lebih dari 1 player: {roles}. Tetap simpan?',
+    warn_no_name: 'Stat sudah diisi tapi nama player belum diisi — poin ini belum masuk ke total tim',
+    copy_header: 'SVS CHAMPIONSHIP — SKOR TIM',
+  },
+  en: {
+    subtitle: 'SVS Championship — Player Score Calculator',
+    identity_title: 'Team Identity',
+    team: 'Team',
+    team_ph: 'IMP / NYX / SS',
+    match: 'Match',
+    match_suffix: 'Match #',
+    lane_role: 'Lane / Role',
+    lineup: 'Team Lineup',
+    player_name_ph: '🎮 Player Name',
+    exp_lane: 'Exp', gold_lane: 'Gold', mid_lane: 'Mid', jungler_lane: 'Jungler', roamer_lane: 'Roam',
+    kda: 'KDA',
+    kill_label: '⚔️ Kill',
+    death_label: '💀 Death',
+    assist_label: '🤝 Assist',
+    kill_hint: 'Enemy hero eliminations',
+    death_hint: 'Deaths in match',
+    assist_hint: 'Assists in eliminations',
+    dmg_dealt_title: 'Hero Damage (%)',
+    dmg_dealt_label: '🔥 Hero Damage',
+    dmg_dealt_hint: '% contribution of total team hero damage',
+    roam_dmg_title: 'Roam Damage (+2)',
+    roam_dmg_label: '🔥 Highest Roam Damage?',
+    roam_dmg_hint: 'Check if roamer has highest damage on team',
+    dmg_taken_title: 'Damage Taken (%)',
+    dmg_taken_label: '🛡️ Damage Taken',
+    dmg_taken_hint_normal: '% contribution of total team damage taken',
+    jungler_type: 'Jungler Type', tank_fighter: 'Tank', others: 'Other',
+    jungler_dmg_hint: 'Damage Taken (+3) only for Tank/Fighter Junglers',
+    turret_title: 'Turret Damage (%)',
+    turret_label: '🏯 Turret Damage',
+    turret_hint: '% contribution of total team turret damage',
+    turtle_title: 'Turtle Slayer 3x (+2)', turtle_label: '🐢 Killed 3+ Turtles?', turtle_hint: 'Check if jungler killed Turtle ≥ 3 times',
+    tfp_title: 'Teamfight Participation (%)',
+    tfp_label: '👥 Teamfight Participation',
+    tfp_hint_bonus: '⚡ Bonus TFP ≥ 80% (+5 automatic)',
+    tfp_hint_normal: '% of teamfights joined out of total',
+    savage_title: 'Savage (+5)', savage_label: '💀 Got Savage?', savage_hint: 'Check if the player got a Savage in this match',
+    mvp_title: 'MVP (+5)',
+    mvp_label: '🏅 Got MVP?',
+    mvp_hint: 'Check if the player got MVP in this match',
+    total_score: 'Team Total',
+    target_label: '🎯 Target',
+    target_hint: 'Enter target score',
+    target_achieved: '✅ Target Achieved!',
+    target_not_achieved: '❌ Target Not Achieved',
+    breakdown_title: 'Team Score Breakdown',
+    total: 'Total',
+    save_btn: '💾 Save Team', copy_btn: '📋 Copy Details', pdf_btn: '📄 Export PDF', export_csv_btn: '📊 Export CSV', clear_btn: '🗑️ Clear All History',
+    history_title: 'Score History', per_match: 'Per Match', per_player: 'Per Player',
+    empty_state: 'No saved data yet.',
+    role_labels: { exp:'EXP LANE', gold:'GOLD LANE', mid:'MID LANE', jungler:'JUNGLER', roamer:'ROAMER' },
+    toast_saved: '✅ Team saved!', toast_copied: '📋 Copied to clipboard!', toast_cleared: '🗑️ History cleared', toast_no_data: '⚠️ Please fill in the data first', toast_empty_name: '⚠️ All players must have a name', toast_no_export: '⚠️ No data to export', toast_no_copy_data: '⚠️ No data to copy',
+    toast_csv_exported: '📊 CSV exported successfully!',
+    confirm_clear: 'Clear all score history?',
+    confirm_dup_role: 'The same role is used by more than 1 player: {roles}. Save anyway?',
+    warn_no_name: 'Stats filled but player name is missing — these points are not included in the team total',
+    copy_header: 'SVS CHAMPIONSHIP — TEAM SCORE',
+  }
+};
+
+function t(key) { return I18N[currentLang][key] || key; }
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('lang-id').className = 'lang-btn' + (lang==='id' ? ' active' : '');
+  document.getElementById('lang-en').className = 'lang-btn' + (lang==='en' ? ' active' : '');
+  applyTranslations();
+  calc();
+  localStorage.setItem('svs_lang', lang);
+}
+
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    el.textContent = t(key);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    el.setAttribute('placeholder', t(key));
+  });
+  updateAllTfpHints();
+  updateTargetStatus();
+  renderHistory();
+}
+
+function updateAllTfpHints() {
+  for (let i = 1; i <= 5; i++) {
+    const role = playerState[i]?.role || 'exp';
+    const cfg = CONFIG[role];
+    const hintEl = document.getElementById(`p${i}-tfp-hint`);
+    if (hintEl) {
+      hintEl.textContent = cfg.showTfpBonus ? t('tfp_hint_bonus') : t('tfp_hint_normal');
+    }
+  }
+}
+
+function updateTargetStatus() {
+  const statusEl = document.getElementById('target-status');
+  const targetInput = document.getElementById('target_score');
+  const totalScore = parseFloat(document.getElementById('total-team-score').textContent) || 0;
+  const target = parseFloat(targetInput.value) || 0;
+  if (target === 0) {
+    statusEl.textContent = t('target_hint');
+    statusEl.className = 'target-status empty';
+    return;
+  }
+  if (totalScore >= target) {
+    statusEl.textContent = t('target_achieved');
+    statusEl.className = 'target-status achieved';
+  } else {
+    statusEl.textContent = t('target_not_achieved');
+    statusEl.className = 'target-status failed';
+  }
+}
+
+// ── PLAYER CONFIG ──────────────────────────────────────────────────────────────
+const CONFIG = {
+  exp:     { label:'EXP LANE',    kill:3, assist:2, death:-1, dmgDealt:4, dmgTaken:3, turret:2, tfp:3, showDmgDealt:true,  showDmgTaken:true,  showTurret:true,  showRoamDmg:false, showJunglerToggle:false, showTurtleSlayer:false, showSavage:false, showTfpBonus:false, showMvp:true, showTfp:true },
+  gold:    { label:'GOLD LANE',   kill:3, assist:1, death:-2, dmgDealt:4, dmgTaken:0, turret:2, tfp:2, showDmgDealt:true,  showDmgTaken:false, showTurret:true,  showRoamDmg:false, showJunglerToggle:false, showTurtleSlayer:false, showSavage:true,  showTfpBonus:false, showMvp:true, showTfp:true },
+  mid:     { label:'MID LANE',    kill:3, assist:2, death:-1, dmgDealt:4, dmgTaken:0, turret:0, tfp:3, showDmgDealt:true,  showDmgTaken:false, showTurret:false, showRoamDmg:false, showJunglerToggle:false, showTurtleSlayer:false, showSavage:true,  showTfpBonus:false, showMvp:true, showTfp:true },
+  jungler: { label:'JUNGLER',     kill:3, assist:1, death:-2, dmgDealt:4, dmgTaken:3, turret:2, tfp:2, showDmgDealt:true,  showDmgTaken:true,  showTurret:true,  showRoamDmg:false, showJunglerToggle:true,  showTurtleSlayer:true,  showSavage:true,  showTfpBonus:false, showMvp:true, showTfp:true },
+  roamer:  { label:'ROAMER',      kill:1, assist:2, death:-1, dmgDealt:0, dmgTaken:3, turret:0, tfp:3, showDmgDealt:false, showDmgTaken:true,  showTurret:false, showRoamDmg:true,  showJunglerToggle:false, showTurtleSlayer:false, showSavage:false, showTfpBonus:true,  showMvp:true, showTfp:true },
+};
+
+// Player state
+const playerState = {
+  1: { role: 'exp', junglerType: 'tank' },
+  2: { role: 'exp', junglerType: 'tank' },
+  3: { role: 'exp', junglerType: 'tank' },
+  4: { role: 'exp', junglerType: 'tank' },
+  5: { role: 'exp', junglerType: 'tank' },
+};
+
+function setPlayerRole(player, role) {
+  playerState[player].role = role;
+  document.querySelectorAll(`.player-card[data-player="${player}"] .role-btn`).forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.role === role);
+  });
+  if (role === 'jungler') {
+    if (!playerState[player].junglerType) {
+      playerState[player].junglerType = 'tank';
+    }
+    document.querySelectorAll(`.player-card[data-player="${player}"] .subtoggle-btn`).forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.jgtype === playerState[player].junglerType);
+    });
+  } else {
+    document.querySelectorAll(`.player-card[data-player="${player}"] .subtoggle-btn`).forEach(btn => {
+      btn.classList.remove('active');
+    });
+  }
+  ['roamDmg', 'turtle', 'savage'].forEach(stat => {
+    const el = document.querySelector(`.p${player}-stat[data-stat="${stat}"]`);
+    if (el && el.type === 'checkbox') el.checked = false;
+  });
+  updatePlayerUI(player);
+  updateAllTfpHints();
+  calc();
+}
+
+function setJunglerType(player, type) {
+  playerState[player].junglerType = type;
+  document.querySelectorAll(`.player-card[data-player="${player}"] .subtoggle-btn`).forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.jgtype === type);
+  });
+  updateAllTfpHints();
+  updatePlayerUI(player);
+  calc();
+}
+
+function updatePlayerUI(player) {
+  const cfg = CONFIG[playerState[player].role];
+  if (!cfg) return;
+  const rows = {
+    'dmg-dealt': cfg.showDmgDealt,
+    'dmg-taken': cfg.showDmgTaken,
+    'turret': cfg.showTurret,
+    'tfp': true,
+    'roam-dmg': cfg.showRoamDmg,
+    'jg-toggle': cfg.showJunglerToggle,
+    'turtle': cfg.showTurtleSlayer,
+    'savage': cfg.showSavage
+  };
+  Object.keys(rows).forEach(key => {
+    const el = document.getElementById(`p${player}-${key}-row`);
+    if (el) el.style.display = rows[key] ? 'flex' : 'none';
+  });
+}
+
+function getPlayerStat(player, stat) {
+  const el = document.querySelector(`.p${player}-stat[data-stat="${stat}"]`);
+  if (!el) return 0;
+  if (el.type === 'checkbox') return el.checked ? 1 : 0;
+  return parseFloat(el.value) || 0;
+}
+
+function getPlayerName(player) {
+  const el = document.getElementById(`p${player}_name`);
+  return el ? el.value.trim() : '';
+}
+
+function calcPlayer(player) {
+  const role = playerState[player].role;
+  const cfg = CONFIG[role];
+  const kill = getPlayerStat(player, 'kill');
+  const death = getPlayerStat(player, 'death');
+  const assist = getPlayerStat(player, 'assist');
+  const dmgDealt = getPlayerStat(player, 'dmgDealt');
+  const dmgTaken = getPlayerStat(player, 'dmgTaken');
+  const turretDmg = getPlayerStat(player, 'turretDmg');
+  const tfp = getPlayerStat(player, 'tfp');
+  const roamDmg = getPlayerStat(player, 'roamDmg');
+  const turtle = getPlayerStat(player, 'turtle');
+  const savage = getPlayerStat(player, 'savage');
+  const mvp = getPlayerStat(player, 'mvp');
+
+  const bKill = kill * cfg.kill;
+  const bDeath = death * cfg.death;
+  const bAssist = assist * cfg.assist;
+  const bDmgDealt = cfg.showDmgDealt ? (dmgDealt/100) * cfg.dmgDealt : 0;
+  let bDmgTaken = 0;
+  if (cfg.showDmgTaken) {
+    bDmgTaken = (role === 'jungler' && playerState[player].junglerType !== 'tank') ? 0 : (dmgTaken/100) * cfg.dmgTaken;
+  }
+  const bTurret = cfg.showTurret ? (turretDmg/100) * cfg.turret : 0;
+  const bTfp = cfg.showTfp ? (tfp/100) * cfg.tfp : 0;
+  const bRoamDmg = cfg.showRoamDmg && roamDmg ? 2 : 0;
+  const bTurtle = cfg.showTurtleSlayer && turtle ? 2 : 0;
+  const bSavage = cfg.showSavage && savage ? 5 : 0;
+  const bMvp = cfg.showMvp && mvp ? 5 : 0;
+  const bTfpBonus = cfg.showTfpBonus && tfp >= 80 ? 5 : 0;
+  const total = bKill + bDeath + bAssist + bDmgDealt + bDmgTaken + bTurret + bRoamDmg + bTurtle + bSavage + bMvp + bTfp + bTfpBonus;
+
+  return {
+    name: getPlayerName(player),
+    role: role,
+    total: parseFloat(total.toFixed(1)),
+    breakdown: { bKill, bDeath, bAssist, bDmgDealt, bDmgTaken, bTurret, bRoamDmg, bTurtle, bSavage, bMvp, bTfp, bTfpBonus }
+  };
+}
+
+// ── CALC ──────────────────────────────────────────────────────────────────────
+let lastMatchResult = null;
+
+function calc() {
+  const teamName = document.getElementById('team_name').value.trim() || 'TEAM';
+  const matchNum = parseInt(document.getElementById('match_num').value) || 1;
+  document.getElementById('team-label').textContent = teamName;
+  document.getElementById('match-label').textContent = `MATCH ${matchNum}`;
+
+  let players = [];
+  let totalTeam = 0;
+  for (let i = 1; i <= 5; i++) {
+    const result = calcPlayer(i);
+    players.push(result);
+    const scoreEl = document.getElementById(`p${i}-total`);
+    if (result.name && result.name.trim() !== '') {
+      totalTeam += result.total;
+      scoreEl.textContent = result.total.toFixed(1);
+      scoreEl.removeAttribute('title');
+    } else if (result.total !== 0) {
+      scoreEl.textContent = '⚠️ ' + result.total.toFixed(1);
+      scoreEl.setAttribute('title', t('warn_no_name'));
+    } else {
+      scoreEl.textContent = result.total.toFixed(1);
+      scoreEl.removeAttribute('title');
+    }
+  }
+  totalTeam = parseFloat(totalTeam.toFixed(1));
+  document.getElementById('total-team-score').textContent = totalTeam;
+
+  const breakdownDiv = document.getElementById('breakdown-players');
+  let html = '';
+  players.forEach((p, idx) => {
+    const br = p.breakdown;
+    const cfg = CONFIG[p.role];
+    const displayName = p.name || `Player ${idx + 1}`;
+    html += `<div style="margin-bottom:8px;border-bottom:1px solid #2A2218;padding-bottom:6px;">
+      <div style="display:flex;justify-content:space-between;font-weight:700;color:var(--gold);font-size:13px;">
+        <span>${displayName} — ${t('role_labels')[p.role]}</span>
+        <span>${p.total}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:11px;color:#8A7C5E;margin-top:2px;">
+        <span>Kill: +${br.bKill}</span>
+        <span>Death: ${br.bDeath}</span>
+        <span>Assist: +${br.bAssist}</span>
+        ${cfg.showDmgDealt ? `<span>Dmg: +${br.bDmgDealt.toFixed(2)}</span>` : ''}
+        ${cfg.showDmgTaken ? `<span>DmgTak: +${br.bDmgTaken.toFixed(2)}</span>` : ''}
+        ${cfg.showTurret ? `<span>Turret: +${br.bTurret.toFixed(2)}</span>` : ''}
+        ${cfg.showRoamDmg ? `<span>Roam: +${br.bRoamDmg}</span>` : ''}
+        ${cfg.showTurtleSlayer ? `<span>Turtle: +${br.bTurtle}</span>` : ''}
+        ${cfg.showSavage ? `<span>Savage: +${br.bSavage}</span>` : ''}
+        <span>MVP: +${br.bMvp}</span>
+        <span>TFP: +${br.bTfp.toFixed(2)}</span>
+        ${cfg.showTfpBonus ? `<span>TFPB: +${br.bTfpBonus}</span>` : ''}
+      </div>
+    </div>`;
+  });
+  html += `<div style="display:flex;justify-content:space-between;font-weight:700;color:var(--gold-light);font-size:16px;border-top:1px solid #5A4826;padding-top:6px;">
+    <span>${t('total')} Tim</span>
+    <span>${totalTeam}</span>
+  </div>`;
+  breakdownDiv.innerHTML = html;
+
+  updateTargetStatus();
+  lastMatchResult = {
+    team: teamName,
+    match: matchNum,
+    target: parseFloat(document.getElementById('target_score').value) || 0,
+    players: players,
+    total: totalTeam,
+    ts: Date.now()
+  };
+}
+
+// ── TARGET PER TEAM ──────────────────────────────────────────────────────────
+function saveTargetPerTeam() {
+  const team = document.getElementById('team_name').value.trim();
+  const targetVal = document.getElementById('target_score').value.trim();
+  if (!team) { updateTargetStatus(); return; }
+  try { localStorage.setItem('svs_target_' + team, targetVal); } catch(e) {}
+}
+
+function loadTargetForTeam(team) {
+  if (!team) { document.getElementById('target_score').value = ''; updateTargetStatus(); return; }
+  try {
+    const saved = localStorage.getItem('svs_target_' + team);
+    document.getElementById('target_score').value = saved !== null ? saved : '';
+  } catch(e) { document.getElementById('target_score').value = ''; }
+  updateTargetStatus();
+}
+
+// ── HELPER: VALIDASI ROSTER ─────────────────────────────────────────────────
+function getFilledPlayers() {
+  if (!lastMatchResult) return [];
+  return lastMatchResult.players.filter(p => p.name && p.name.trim() !== '');
+}
+
+function findDuplicateRoles(players) {
+  const seen = {};
+  const dupes = new Set();
+  players.forEach(p => {
+    if (seen[p.role]) dupes.add(p.role);
+    seen[p.role] = true;
+  });
+  return Array.from(dupes);
+}
+
+// ── SAVE ──────────────────────────────────────────────────────────────────────
+function saveEntry() {
+  if (!lastMatchResult) { showToast(t('toast_no_data'), '#8B3030'); return; }
+
+  const filled = getFilledPlayers();
+  if (filled.length === 0) {
+    showToast(t('toast_empty_name'), '#8B3030');
+    return;
+  }
+
+  const dupes = findDuplicateRoles(filled);
+  if (dupes.length > 0) {
+    const roleNames = dupes.map(r => t('role_labels')[r]).join(', ');
+    const msg = t('confirm_dup_role').replace('{roles}', roleNames);
+    if (!confirm(msg)) return;
+  }
+
+  const entryToSave = {
+    ...lastMatchResult,
+    players: filled,
+    total: parseFloat(filled.reduce((sum, p) => sum + p.total, 0).toFixed(1))
+  };
+
+  let data = [];
+  try { data = JSON.parse(localStorage.getItem('svs_history') || '[]'); } catch(e) {}
+  data.push(entryToSave);
+  localStorage.setItem('svs_history', JSON.stringify(data));
+  showToast(t('toast_saved'));
+  renderHistory();
+}
+
+function deleteEntry(ts) {
+  let data = JSON.parse(localStorage.getItem('svs_history') || '[]');
+  data = data.filter(e => String(e.ts) !== String(ts));
+  localStorage.setItem('svs_history', JSON.stringify(data));
+  renderHistory();
+}
+
+function clearAllHistory() {
+  if (!confirm(t('confirm_clear'))) return;
+  localStorage.removeItem('svs_history');
+  renderHistory();
+  showToast(t('toast_cleared'), '#8B3030');
+}
+
+// ── RENDER HISTORY ────────────────────────────────────────────────────────────
+function renderHistory() {
+  let data = [];
+  try { data = JSON.parse(localStorage.getItem('svs_history') || '[]'); } catch(e) {}
+  data = data.map(entry => {
+    if (entry.players) return entry;
+    return {
+      team: entry.team || '',
+      match: entry.match || 1,
+      target: 0,
+      players: [{
+        name: entry.name || 'Player',
+        role: entry.role || 'exp',
+        total: entry.total || 0,
+        breakdown: entry.breakdown || {}
+      }],
+      total: entry.total || 0,
+      ts: entry.ts || Date.now()
+    };
+  });
+
+  const matchEl = document.getElementById('history-match-list');
+  if (!data.length) {
+    matchEl.innerHTML = `<div class="empty-state">${t('empty_state')}</div>`;
+  } else {
+    const byMatch = {};
+    data.forEach(e => {
+      const k = `${t('match')} ${e.match} — ${e.team}`;
+      if (!byMatch[k]) byMatch[k] = [];
+      byMatch[k].push(e);
+    });
+    matchEl.innerHTML = Object.entries(byMatch).sort((a,b)=> a[0].localeCompare(b[0])).map(([match, entries]) => `
+      <div class="match-label">${match}</div>
+      ${entries.map(e => `
+        <div class="history-entry">
+          <div class="history-header">
+            <div>
+              <div class="history-name">${e.team}</div>
+              <div class="history-meta">${e.players.map(p => `${p.name} (${t('role_labels')[p.role]})`).join(' | ')}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="history-score">${e.total}</span>
+              <button class="history-del" onclick="deleteEntry('${String(e.ts).replace(/'/g, "\\'")}')">✕</button>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    `).join('');
+  }
+
+  const playerEl = document.getElementById('history-player-list');
+  if (!data.length) {
+    playerEl.innerHTML = `<div class="empty-state">${t('empty_state')}</div>`;
+  } else {
+    const byPlayer = {};
+    data.forEach(e => {
+      e.players.forEach(p => {
+        const k = `${p.name}|${e.team}`;
+        if (!byPlayer[k]) byPlayer[k] = { name: p.name, team: e.team, total: 0, matches: [] };
+        byPlayer[k].total += p.total;
+        byPlayer[k].matches.push({ match: e.match, score: p.total, role: p.role });
+      });
+    });
+    const sorted = Object.values(byPlayer).sort((a,b)=>b.total-a.total);
+    playerEl.innerHTML = sorted.map(p => `
+      <div class="player-total">
+        <div>
+          <div class="name">${p.name}${p.team?' — '+p.team:''}</div>
+          <div class="matches">${p.matches.map(m=>`M${m.match}: ${m.score} (${t('role_labels')[m.role]})`).join(' | ')}</div>
+        </div>
+        <div class="score">${p.total.toFixed(1)}</div>
+      </div>
+    `).join('');
+  }
+}
+
+// ── EXPORT CSV ────────────────────────────────────────────────────────────────
+function exportCSV() {
+  let data = [];
+  try { data = JSON.parse(localStorage.getItem('svs_history') || '[]'); } catch(e) {}
+  data = data.map(entry => {
+    if (entry.players) return entry;
+    return {
+      team: entry.team || '',
+      match: entry.match || 1,
+      target: 0,
+      players: [{
+        name: entry.name || 'Player',
+        role: entry.role || 'exp',
+        total: entry.total || 0,
+        breakdown: entry.breakdown || {}
+      }],
+      total: entry.total || 0,
+      ts: entry.ts || Date.now()
+    };
+  });
+  if (!data.length) { showToast(t('toast_no_export'), '#8B3030'); return; }
+  const headers = ['Team','Match','Player','Role','Kill','Death','Assist','DamageDealt','DamageTaken','Turret','RoamDamage','TurtleSlayer','Savage','MVP','TFP','TFPBonus','Total'];
+  function csvEscape(val) {
+    const str = String(val);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+  }
+  const rows = [];
+  data.forEach(entry => {
+    entry.players.forEach(p => {
+      const b = p.breakdown || {};
+      rows.push([
+        csvEscape(entry.team || ''),
+        entry.match || '',
+        csvEscape(p.name || ''),
+        p.role || '',
+        b.bKill || 0,
+        b.bDeath || 0,
+        b.bAssist || 0,
+        b.bDmgDealt || 0,
+        b.bDmgTaken || 0,
+        b.bTurret || 0,
+        b.bRoamDmg || 0,
+        b.bTurtle || 0,
+        b.bSavage || 0,
+        b.bMvp || 0,
+        b.bTfp || 0,
+        b.bTfpBonus || 0,
+        p.total || 0
+      ]);
+    });
+  });
+  const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = 'SVS_Score_History.csv';
+  link.click();
+  URL.revokeObjectURL(url);
+  showToast(t('toast_csv_exported'));
+}
+
+// ── COPY TO CLIPBOARD ────────────────────────────────────────────────────────
+function copyToClipboard() {
+  if (!lastMatchResult) { showToast(t('toast_no_copy_data'), '#8B3030'); return; }
+  const filled = getFilledPlayers();
+  if (filled.length === 0) { showToast(t('toast_empty_name'), '#8B3030'); return; }
+
+  const r = lastMatchResult;
+  const teamTotal = parseFloat(filled.reduce((sum, p) => sum + p.total, 0).toFixed(1));
+  let txt = `╔══ ${t('copy_header')} ══╗\n`;
+  txt += `🏷️ ${r.team} | ${t('match')} ${r.match}\n`;
+  txt += `─────────────────────────────────\n`;
+  filled.forEach(p => {
+    const br = p.breakdown;
+    const cfg = CONFIG[p.role];
+    txt += `\n👤 ${p.name} — ${t('role_labels')[p.role]}\n`;
+    txt += `   Kill (+${cfg.kill})      : +${br.bKill}\n`;
+    txt += `   Death (${cfg.death})     : ${br.bDeath}\n`;
+    txt += `   Assist (+${cfg.assist})    : +${br.bAssist}\n`;
+    if (cfg.showDmgDealt)    txt += `   Hero Damage   : +${br.bDmgDealt.toFixed(2)}\n`;
+    if (cfg.showRoamDmg)     txt += `   Roam Damage    : +${br.bRoamDmg}\n`;
+    if (cfg.showDmgTaken)    txt += `   Damage Taken   : +${br.bDmgTaken.toFixed(2)}\n`;
+    if (cfg.showTurret)      txt += `   Turret Damage  : +${br.bTurret.toFixed(2)}\n`;
+    if (cfg.showTurtleSlayer)txt += `   Turtle Slayer  : +${br.bTurtle}\n`;
+    txt += `   TFP            : +${br.bTfp.toFixed(2)}\n`;
+    if (cfg.showTfpBonus)    txt += `   TFP Bonus      : +${br.bTfpBonus}\n`;
+    if (cfg.showSavage)      txt += `   Savage         : +${br.bSavage}\n`;
+    txt += `   MVP            : +${br.bMvp}\n`;
+    txt += `   ────────────────\n`;
+    txt += `   TOTAL PLAYER   : ${p.total}\n`;
+  });
+  txt += `─────────────────────────────────\n`;
+  txt += `📊 ${t('total_score').toUpperCase()}        : ${teamTotal}\n`;
+  txt += `╚════════════════════════════════╝`;
+
+  navigator.clipboard.writeText(txt).then(() => showToast(t('toast_copied')))
+  .catch(() => { const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast(t('toast_copied')); });
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function switchTab(id, event) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (event && event.target) event.target.classList.add('active');
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function clampPct(el) { if(el.value>100)el.value=100; if(el.value<0)el.value=0; }
+function showToast(msg, color='#1D7A5A') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.background = color;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.getElementById('team_name').addEventListener('input', function() {
+  loadTargetForTeam(this.value.trim());
+  calc();
+});
+document.getElementById('match_num').addEventListener('input', calc);
+
+for (let i = 1; i <= 5; i++) {
+  updatePlayerUI(i);
+  document.querySelectorAll(`.p${i}-stat`).forEach(el => {
+    el.addEventListener('input', calc);
+    el.addEventListener('change', calc);
+  });
+  const nameEl = document.getElementById(`p${i}_name`);
+  if (nameEl) nameEl.addEventListener('input', calc);
+}
+
+const savedLang = localStorage.getItem('svs_lang') || 'id';
+currentLang = savedLang;
+document.getElementById('lang-id').className = 'lang-btn' + (savedLang==='id' ? ' active' : '');
+document.getElementById('lang-en').className = 'lang-btn' + (savedLang==='en' ? ' active' : '');
+applyTranslations();
+renderHistory();
+calc();
+
+window.addEventListener('load', function() {
+  const team = document.getElementById('team_name').value.trim();
+  if (team) loadTargetForTeam(team);
+});
+</script>
+</body>
+</html>
