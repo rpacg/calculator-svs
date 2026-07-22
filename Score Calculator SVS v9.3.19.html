@@ -796,6 +796,12 @@ function setPlayerRole(player, role) {
   document.querySelectorAll(`.player-card[data-player="${player}"] .role-btn`).forEach(btn => {
     btn.classList.toggle('active', btn.dataset.role === role);
   });
+  if (role === 'jungler' && !playerState[player].junglerType) {
+    playerState[player].junglerType = 'tank';
+  }
+  document.querySelectorAll(`.player-card[data-player="${player}"] .subtoggle-btn`).forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.jgtype === playerState[player].junglerType);
+  });
   ['roamDmg', 'turtle', 'savage'].forEach(stat => {
     const el = document.querySelector(`.p${player}-stat[data-stat="${stat}"]`);
     if (el && el.type === 'checkbox') el.checked = false;
