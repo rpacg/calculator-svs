@@ -1,0 +1,3 @@
+Memory action log created.
+Auto commit/push enabled for repository-level /memories operations.
+Note: Internal preference stored in /memories/preferences.md (AI memory store).
