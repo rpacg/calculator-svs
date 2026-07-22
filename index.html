@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>SVS Championship — Kalkulator Skor v9.3.0</title>
+<title>SVS Championship — Kalkulator Skor v9.3.14</title>
 <style>
   :root {
     --gold: #E8B84B; --gold-light: #F5E6C4;
@@ -58,9 +58,17 @@
   .row input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--gold); cursor: pointer; }
   .pct-input { width: 60px !important; }
   .pct-sign { color: var(--gold); font-weight: 700; }
-  .formula-hint { font-size: 11px; color: #7A6E54; margin: 4px 0 0; }
-  .mode-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 8px; }
-  .mode-grid.row2 { grid-template-columns: repeat(2,1fr); margin-bottom: 14px; }
+  .formula-hint { 
+    font-size: 10px; 
+    color: #7A6E54; 
+    margin: 0; 
+    display: block; 
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   .mode-btn { 
     padding: 10px 4px; 
     font-size: 12px; 
@@ -74,10 +82,8 @@
     white-space: nowrap;
   }
   .mode-btn.active { background: linear-gradient(135deg,#B8862F,#E8B84B); border-color: var(--gold); color: #1A1410; box-shadow: 0 0 12px rgba(232,184,75,0.35); }
-  .subtoggle-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 6px; margin-top: 6px; }
   .subtoggle-btn { padding: 8px 4px; font-size: 11px; font-weight: 600; border-radius: 8px; border: 1px solid var(--input-border); background: rgba(15,12,9,0.6); color: var(--text-secondary); cursor: pointer; }
   .subtoggle-btn.active { background: linear-gradient(135deg,#8a6a24,#c79b3c); border-color: var(--gold); color: #1A1410; }
-  h2.section-title { font-size: 15px; font-weight: 600; margin: 0 0 10px; color: #E8D9B5; display: flex; align-items: center; gap: 6px; }
 
   /* Score Box */
   .score-box { 
@@ -151,7 +157,6 @@
   .breakdown-row:last-child { border-bottom: none; }
   .breakdown-row .key { color: #8A7C5E; }
   .breakdown-row .val { font-weight: 600; color: var(--gold); }
-  .neg-val { color: var(--neg) !important; }
   .total-row { border-top: 1px solid #5A4826; margin-top: 4px; padding-top: 8px; }
   .total-row .key { font-weight: 700; color: #E8D9B5; }
   .total-row .val { font-size: 16px; color: var(--gold-light); }
@@ -214,9 +219,11 @@
     flex-wrap: wrap;
   }
   .player-card .player-name-input {
-    width: 120px;
-    padding: 4px 8px;
+    flex: 1;
+    min-width: 140px;
+    padding: 6px 10px;
     font-size: 13px;
+    text-align: center;
     border-radius: 6px;
     border: 1px solid var(--input-border);
     background: var(--input-bg);
@@ -252,8 +259,8 @@
   .player-card .stat-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 6px;
+    gap: 4px;
+    margin-bottom: 4px;
     align-items: center;
   }
   .player-card .stat-row label {
@@ -284,11 +291,6 @@
     font-weight: 700;
     font-size: 12px;
   }
-  .player-card .stat-row .formula-hint {
-    font-size: 10px;
-    color: #7A6E54;
-    margin: 0;
-  }
   .player-card .player-score-small {
     font-size: 18px;
     font-weight: 700;
@@ -296,16 +298,11 @@
     text-align: right;
     min-width: 60px;
   }
-  .player-card .player-label-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--gold);
-  }
 
   @media print {
     body { background: #fff !important; padding: 0; }
     body::before { display: none; }
-    .spacer, .action-grid, .tab-bar, footer, .mode-grid, #card-kda, #card-hero-damage, #card-roam-damage, #card-damage-taken, #card-turret-damage, #card-turtle-slayer, #card-tfp, #card-savage, .card:first-child { display: none !important; }
+    .spacer, .action-grid, .tab-bar, footer, .card:first-child { display: none !important; }
     .score-box, .card { border: 1px solid #ccc !important; background: #fff !important; color: #000 !important; }
     .score-big, .score-team-name, .score-role-tag, .score-label, .breakdown-row .key, .breakdown-row .val, .total-row .key, .total-row .val { color: #000 !important; text-shadow: none !important; }
     .tab-content { display: block !important; }
@@ -398,163 +395,167 @@
     <!-- Player 1 -->
     <div class="player-card" data-player="1">
       <div class="player-header">
-        <span class="player-label-name" data-i18n="player_label">🎮 Player 1</span>
-        <input type="text" class="player-name-input" id="p1_name" placeholder="Nama player" data-i18n-placeholder="player_name_ph">
+        <input type="text" class="player-name-input" id="p1_name" name="p1_name" placeholder="🎮 Nama Player" data-i18n-placeholder="player_name_ph">
         <span class="player-score-small" id="p1-total">0</span>
       </div>
-      <!-- Role -->
       <div class="role-grid">
         <button class="role-btn active" data-player="1" data-role="exp" onclick="setPlayerRole(1,'exp')" data-i18n="exp_lane">Exp</button>
         <button class="role-btn" data-player="1" data-role="gold" onclick="setPlayerRole(1,'gold')" data-i18n="gold_lane">Gold</button>
         <button class="role-btn" data-player="1" data-role="mid" onclick="setPlayerRole(1,'mid')" data-i18n="mid_lane">Mid</button>
-        <button class="role-btn" data-player="1" data-role="jungler" onclick="setPlayerRole(1,'jungler')" data-i18n="jungler_lane">JG</button>
+        <button class="role-btn" data-player="1" data-role="jungler" onclick="setPlayerRole(1,'jungler')" data-i18n="jungler_lane">Jungler</button>
         <button class="role-btn" data-player="1" data-role="roamer" onclick="setPlayerRole(1,'roamer')" data-i18n="roamer_lane">Roam</button>
       </div>
       <!-- Stats -->
-      <div class="stat-row"><label data-i18n="kill_label">Kill (+3)</label><input type="number" class="p1-stat" data-stat="kill" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="death_label">Death (-1)</label><input type="number" class="p1-stat" data-stat="death" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="assist_label">Assist (+2)</label><input type="number" class="p1-stat" data-stat="assist" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="dmg_dealt_label">Hero Damage</label><input type="number" class="p1-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row" id="p1-roam-dmg-row" style="display:none;"><label data-i18n="roam_dmg_label">Roam Damage tertinggi?</label><input type="checkbox" class="p1-stat" data-stat="roamDmg" onchange="calc()"></div>
-      <div class="stat-row"><label data-i18n="turret_label">Damage Turret</label><input type="number" class="p1-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row"><label data-i18n="dmg_taken_label">Damage Diterima</label><input type="number" class="p1-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
+      <div class="stat-row"><label for="p1_kill" data-i18n="kill_label">⚔️ Kill (+3)</label><input type="number" class="p1-stat" data-stat="kill" min="0" id="p1_kill" name="p1_kill" oninput="calc()"><span class="formula-hint" data-i18n="kill_hint"></span></div>
+      <div class="stat-row"><label for="p1_death" data-i18n="death_label">💀 Death (-1)</label><input type="number" class="p1-stat" data-stat="death" min="0" id="p1_death" name="p1_death" oninput="calc()"><span class="formula-hint" data-i18n="death_hint"></span></div>
+      <div class="stat-row"><label for="p1_assist" data-i18n="assist_label">🤝 Assist (+2)</label><input type="number" class="p1-stat" data-stat="assist" min="0" id="p1_assist" name="p1_assist" oninput="calc()"><span class="formula-hint" data-i18n="assist_hint"></span></div>
+      <div class="stat-row" id="p1-dmg-dealt-row"><label for="p1_dmgDealt" data-i18n="dmg_dealt_label">🔥 Hero Damage</label><input type="number" class="p1-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" id="p1_dmgDealt" name="p1_dmgDealt" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_dealt_hint"></span></div>
+      <div class="stat-row" id="p1-roam-dmg-row" style="display:none;"><label for="p1_roamDmg" data-i18n="roam_dmg_label">🔥 Roam Damage tertinggi?</label><input type="checkbox" class="p1-stat" data-stat="roamDmg" id="p1_roamDmg" name="p1_roamDmg" onchange="calc()"><span class="formula-hint" data-i18n="roam_dmg_hint"></span></div>
+      <div class="stat-row" id="p1-turret-row"><label for="p1_turretDmg" data-i18n="turret_label">🏯 Damage Turret</label><input type="number" class="p1-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" id="p1_turretDmg" name="p1_turretDmg" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="turret_hint"></span></div>
+      <div class="stat-row" id="p1-dmg-taken-row"><label for="p1_dmgTaken" data-i18n="dmg_taken_label">🛡️ Damage Diterima</label><input type="number" class="p1-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" id="p1_dmgTaken" name="p1_dmgTaken" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_taken_hint_normal"></span></div>
       <div class="stat-row" id="p1-jg-toggle" style="display:none;">
-        <label data-i18n="jungler_type">Tipe JG</label>
+        <label data-i18n="jungler_type">Tipe Jungler</label>
         <button class="subtoggle-btn active" data-player="1" data-jgtype="tank" onclick="setJunglerType(1,'tank')" data-i18n="tank_fighter">Tank</button>
         <button class="subtoggle-btn" data-player="1" data-jgtype="other" onclick="setJunglerType(1,'other')" data-i18n="others">Lain</button>
+        <span class="formula-hint" data-i18n="jungler_dmg_hint"></span>
       </div>
-      <div class="stat-row"><label data-i18n="tfp_label">Partisipasi Teamfight</label><input type="number" class="p1-stat pct-input" data-stat="tfp" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row" id="p1-turtle-row" style="display:none;"><label data-i18n="turtle_label">Bunuh 3+ Turtle?</label><input type="checkbox" class="p1-stat" data-stat="turtle" onchange="calc()"></div>
-      <div class="stat-row" id="p1-savage-row" style="display:none;"><label data-i18n="savage_label">Dapat Savage?</label><input type="checkbox" class="p1-stat" data-stat="savage" onchange="calc()"></div>
-      <div class="stat-row"><label data-i18n="mvp_label">Dapat MVP?</label><input type="checkbox" class="p1-stat" data-stat="mvp" onchange="calc()"></div>
+      <div class="stat-row" id="p1-tfp-row"><label for="p1_tfp" data-i18n="tfp_label">👥 Partisipasi Teamfight</label><input type="number" class="p1-stat pct-input" data-stat="tfp" min="0" max="100" step="1" id="p1_tfp" name="p1_tfp" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" id="p1-tfp-hint" data-i18n="tfp_hint_normal"></span></div>
+      <div class="stat-row" id="p1-tfp-bonus-row" style="display:none;"><label data-i18n="tfp_hint_bonus">⚡ Bonus TFP ≥ 80%</label><span class="val" style="color:var(--gold);font-weight:600;">+5</span></div>
+      <div class="stat-row" id="p1-turtle-row" style="display:none;"><label for="p1_turtle" data-i18n="turtle_label">🐢 Bunuh 3+ Turtle?</label><input type="checkbox" class="p1-stat" data-stat="turtle" id="p1_turtle" name="p1_turtle" onchange="calc()"><span class="formula-hint" data-i18n="turtle_hint"></span></div>
+      <div class="stat-row" id="p1-savage-row" style="display:none;"><label for="p1_savage" data-i18n="savage_label">💀 Dapat Savage?</label><input type="checkbox" class="p1-stat" data-stat="savage" id="p1_savage" name="p1_savage" onchange="calc()"><span class="formula-hint" data-i18n="savage_hint"></span></div>
+      <div class="stat-row"><label for="p1_mvp" data-i18n="mvp_label">🏅 Dapat MVP?</label><input type="checkbox" class="p1-stat" data-stat="mvp" id="p1_mvp" name="p1_mvp" onchange="calc()"><span class="formula-hint" data-i18n="mvp_hint"></span></div>
     </div>
 
     <!-- Player 2 -->
     <div class="player-card" data-player="2">
       <div class="player-header">
-        <span class="player-label-name" data-i18n="player_label">🎮 Player 2</span>
-        <input type="text" class="player-name-input" id="p2_name" placeholder="Nama player" data-i18n-placeholder="player_name_ph">
+        <input type="text" class="player-name-input" id="p2_name" name="p2_name" placeholder="🎮 Nama Player" data-i18n-placeholder="player_name_ph">
         <span class="player-score-small" id="p2-total">0</span>
       </div>
       <div class="role-grid">
         <button class="role-btn active" data-player="2" data-role="exp" onclick="setPlayerRole(2,'exp')" data-i18n="exp_lane">Exp</button>
         <button class="role-btn" data-player="2" data-role="gold" onclick="setPlayerRole(2,'gold')" data-i18n="gold_lane">Gold</button>
         <button class="role-btn" data-player="2" data-role="mid" onclick="setPlayerRole(2,'mid')" data-i18n="mid_lane">Mid</button>
-        <button class="role-btn" data-player="2" data-role="jungler" onclick="setPlayerRole(2,'jungler')" data-i18n="jungler_lane">JG</button>
+        <button class="role-btn" data-player="2" data-role="jungler" onclick="setPlayerRole(2,'jungler')" data-i18n="jungler_lane">Jungler</button>
         <button class="role-btn" data-player="2" data-role="roamer" onclick="setPlayerRole(2,'roamer')" data-i18n="roamer_lane">Roam</button>
       </div>
-      <div class="stat-row"><label data-i18n="kill_label">Kill (+3)</label><input type="number" class="p2-stat" data-stat="kill" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="death_label">Death (-1)</label><input type="number" class="p2-stat" data-stat="death" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="assist_label">Assist (+2)</label><input type="number" class="p2-stat" data-stat="assist" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="dmg_dealt_label">Hero Damage</label><input type="number" class="p2-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row" id="p2-roam-dmg-row" style="display:none;"><label data-i18n="roam_dmg_label">Roam Damage tertinggi?</label><input type="checkbox" class="p2-stat" data-stat="roamDmg" onchange="calc()"></div>
-      <div class="stat-row"><label data-i18n="turret_label">Damage Turret</label><input type="number" class="p2-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row"><label data-i18n="dmg_taken_label">Damage Diterima</label><input type="number" class="p2-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
+      <div class="stat-row"><label for="p2_kill" data-i18n="kill_label">⚔️ Kill (+3)</label><input type="number" class="p2-stat" data-stat="kill" min="0" id="p2_kill" name="p2_kill" oninput="calc()"><span class="formula-hint" data-i18n="kill_hint"></span></div>
+      <div class="stat-row"><label for="p2_death" data-i18n="death_label">💀 Death (-1)</label><input type="number" class="p2-stat" data-stat="death" min="0" id="p2_death" name="p2_death" oninput="calc()"><span class="formula-hint" data-i18n="death_hint"></span></div>
+      <div class="stat-row"><label for="p2_assist" data-i18n="assist_label">🤝 Assist (+2)</label><input type="number" class="p2-stat" data-stat="assist" min="0" id="p2_assist" name="p2_assist" oninput="calc()"><span class="formula-hint" data-i18n="assist_hint"></span></div>
+      <div class="stat-row" id="p2-dmg-dealt-row"><label for="p2_dmgDealt" data-i18n="dmg_dealt_label">🔥 Hero Damage</label><input type="number" class="p2-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" id="p2_dmgDealt" name="p2_dmgDealt" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_dealt_hint"></span></div>
+      <div class="stat-row" id="p2-roam-dmg-row" style="display:none;"><label for="p2_roamDmg" data-i18n="roam_dmg_label">🔥 Roam Damage tertinggi?</label><input type="checkbox" class="p2-stat" data-stat="roamDmg" id="p2_roamDmg" name="p2_roamDmg" onchange="calc()"><span class="formula-hint" data-i18n="roam_dmg_hint"></span></div>
+      <div class="stat-row" id="p2-turret-row"><label for="p2_turretDmg" data-i18n="turret_label">🏯 Damage Turret</label><input type="number" class="p2-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" id="p2_turretDmg" name="p2_turretDmg" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="turret_hint"></span></div>
+      <div class="stat-row" id="p2-dmg-taken-row"><label for="p2_dmgTaken" data-i18n="dmg_taken_label">🛡️ Damage Diterima</label><input type="number" class="p2-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" id="p2_dmgTaken" name="p2_dmgTaken" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_taken_hint_normal"></span></div>
       <div class="stat-row" id="p2-jg-toggle" style="display:none;">
-        <label data-i18n="jungler_type">Tipe JG</label>
+        <label data-i18n="jungler_type">Tipe Jungler</label>
         <button class="subtoggle-btn active" data-player="2" data-jgtype="tank" onclick="setJunglerType(2,'tank')" data-i18n="tank_fighter">Tank</button>
         <button class="subtoggle-btn" data-player="2" data-jgtype="other" onclick="setJunglerType(2,'other')" data-i18n="others">Lain</button>
+        <span class="formula-hint" data-i18n="jungler_dmg_hint"></span>
       </div>
-      <div class="stat-row"><label data-i18n="tfp_label">Partisipasi Teamfight</label><input type="number" class="p2-stat pct-input" data-stat="tfp" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row" id="p2-turtle-row" style="display:none;"><label data-i18n="turtle_label">Bunuh 3+ Turtle?</label><input type="checkbox" class="p2-stat" data-stat="turtle" onchange="calc()"></div>
-      <div class="stat-row" id="p2-savage-row" style="display:none;"><label data-i18n="savage_label">Dapat Savage?</label><input type="checkbox" class="p2-stat" data-stat="savage" onchange="calc()"></div>
-      <div class="stat-row"><label data-i18n="mvp_label">Dapat MVP?</label><input type="checkbox" class="p2-stat" data-stat="mvp" onchange="calc()"></div>
+      <div class="stat-row" id="p2-tfp-row"><label for="p2_tfp" data-i18n="tfp_label">👥 Partisipasi Teamfight</label><input type="number" class="p2-stat pct-input" data-stat="tfp" min="0" max="100" step="1" id="p2_tfp" name="p2_tfp" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" id="p2-tfp-hint" data-i18n="tfp_hint_normal"></span></div>
+      <div class="stat-row" id="p2-tfp-bonus-row" style="display:none;"><label data-i18n="tfp_hint_bonus">⚡ Bonus TFP ≥ 80%</label><span class="val" style="color:var(--gold);font-weight:600;">+5</span></div>
+      <div class="stat-row" id="p2-turtle-row" style="display:none;"><label for="p2_turtle" data-i18n="turtle_label">🐢 Bunuh 3+ Turtle?</label><input type="checkbox" class="p2-stat" data-stat="turtle" id="p2_turtle" name="p2_turtle" onchange="calc()"><span class="formula-hint" data-i18n="turtle_hint"></span></div>
+      <div class="stat-row" id="p2-savage-row" style="display:none;"><label for="p2_savage" data-i18n="savage_label">💀 Dapat Savage?</label><input type="checkbox" class="p2-stat" data-stat="savage" id="p2_savage" name="p2_savage" onchange="calc()"><span class="formula-hint" data-i18n="savage_hint"></span></div>
+      <div class="stat-row"><label for="p2_mvp" data-i18n="mvp_label">🏅 Dapat MVP?</label><input type="checkbox" class="p2-stat" data-stat="mvp" id="p2_mvp" name="p2_mvp" onchange="calc()"><span class="formula-hint" data-i18n="mvp_hint"></span></div>
     </div>
 
     <!-- Player 3 -->
     <div class="player-card" data-player="3">
       <div class="player-header">
-        <span class="player-label-name" data-i18n="player_label">🎮 Player 3</span>
-        <input type="text" class="player-name-input" id="p3_name" placeholder="Nama player" data-i18n-placeholder="player_name_ph">
+        <input type="text" class="player-name-input" id="p3_name" name="p3_name" placeholder="🎮 Nama Player" data-i18n-placeholder="player_name_ph">
         <span class="player-score-small" id="p3-total">0</span>
       </div>
       <div class="role-grid">
         <button class="role-btn active" data-player="3" data-role="exp" onclick="setPlayerRole(3,'exp')" data-i18n="exp_lane">Exp</button>
         <button class="role-btn" data-player="3" data-role="gold" onclick="setPlayerRole(3,'gold')" data-i18n="gold_lane">Gold</button>
         <button class="role-btn" data-player="3" data-role="mid" onclick="setPlayerRole(3,'mid')" data-i18n="mid_lane">Mid</button>
-        <button class="role-btn" data-player="3" data-role="jungler" onclick="setPlayerRole(3,'jungler')" data-i18n="jungler_lane">JG</button>
+        <button class="role-btn" data-player="3" data-role="jungler" onclick="setPlayerRole(3,'jungler')" data-i18n="jungler_lane">Jungler</button>
         <button class="role-btn" data-player="3" data-role="roamer" onclick="setPlayerRole(3,'roamer')" data-i18n="roamer_lane">Roam</button>
       </div>
-      <div class="stat-row"><label data-i18n="kill_label">Kill (+3)</label><input type="number" class="p3-stat" data-stat="kill" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="death_label">Death (-1)</label><input type="number" class="p3-stat" data-stat="death" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="assist_label">Assist (+2)</label><input type="number" class="p3-stat" data-stat="assist" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="dmg_dealt_label">Hero Damage</label><input type="number" class="p3-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row" id="p3-roam-dmg-row" style="display:none;"><label data-i18n="roam_dmg_label">Roam Damage tertinggi?</label><input type="checkbox" class="p3-stat" data-stat="roamDmg" onchange="calc()"></div>
-      <div class="stat-row"><label data-i18n="turret_label">Damage Turret</label><input type="number" class="p3-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row"><label data-i18n="dmg_taken_label">Damage Diterima</label><input type="number" class="p3-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
+      <div class="stat-row"><label for="p3_kill" data-i18n="kill_label">⚔️ Kill (+3)</label><input type="number" class="p3-stat" data-stat="kill" min="0" id="p3_kill" name="p3_kill" oninput="calc()"><span class="formula-hint" data-i18n="kill_hint"></span></div>
+      <div class="stat-row"><label for="p3_death" data-i18n="death_label">💀 Death (-1)</label><input type="number" class="p3-stat" data-stat="death" min="0" id="p3_death" name="p3_death" oninput="calc()"><span class="formula-hint" data-i18n="death_hint"></span></div>
+      <div class="stat-row"><label for="p3_assist" data-i18n="assist_label">🤝 Assist (+2)</label><input type="number" class="p3-stat" data-stat="assist" min="0" id="p3_assist" name="p3_assist" oninput="calc()"><span class="formula-hint" data-i18n="assist_hint"></span></div>
+      <div class="stat-row" id="p3-dmg-dealt-row"><label for="p3_dmgDealt" data-i18n="dmg_dealt_label">🔥 Hero Damage</label><input type="number" class="p3-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" id="p3_dmgDealt" name="p3_dmgDealt" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_dealt_hint"></span></div>
+      <div class="stat-row" id="p3-roam-dmg-row" style="display:none;"><label for="p3_roamDmg" data-i18n="roam_dmg_label">🔥 Roam Damage tertinggi?</label><input type="checkbox" class="p3-stat" data-stat="roamDmg" id="p3_roamDmg" name="p3_roamDmg" onchange="calc()"><span class="formula-hint" data-i18n="roam_dmg_hint"></span></div>
+      <div class="stat-row" id="p3-turret-row"><label for="p3_turretDmg" data-i18n="turret_label">🏯 Damage Turret</label><input type="number" class="p3-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" id="p3_turretDmg" name="p3_turretDmg" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="turret_hint"></span></div>
+      <div class="stat-row" id="p3-dmg-taken-row"><label for="p3_dmgTaken" data-i18n="dmg_taken_label">🛡️ Damage Diterima</label><input type="number" class="p3-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" id="p3_dmgTaken" name="p3_dmgTaken" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_taken_hint_normal"></span></div>
       <div class="stat-row" id="p3-jg-toggle" style="display:none;">
-        <label data-i18n="jungler_type">Tipe JG</label>
+        <label data-i18n="jungler_type">Tipe Jungler</label>
         <button class="subtoggle-btn active" data-player="3" data-jgtype="tank" onclick="setJunglerType(3,'tank')" data-i18n="tank_fighter">Tank</button>
         <button class="subtoggle-btn" data-player="3" data-jgtype="other" onclick="setJunglerType(3,'other')" data-i18n="others">Lain</button>
+        <span class="formula-hint" data-i18n="jungler_dmg_hint"></span>
       </div>
-      <div class="stat-row"><label data-i18n="tfp_label">Partisipasi Teamfight</label><input type="number" class="p3-stat pct-input" data-stat="tfp" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row" id="p3-turtle-row" style="display:none;"><label data-i18n="turtle_label">Bunuh 3+ Turtle?</label><input type="checkbox" class="p3-stat" data-stat="turtle" onchange="calc()"></div>
-      <div class="stat-row" id="p3-savage-row" style="display:none;"><label data-i18n="savage_label">Dapat Savage?</label><input type="checkbox" class="p3-stat" data-stat="savage" onchange="calc()"></div>
-      <div class="stat-row"><label data-i18n="mvp_label">Dapat MVP?</label><input type="checkbox" class="p3-stat" data-stat="mvp" onchange="calc()"></div>
+      <div class="stat-row" id="p3-tfp-row"><label for="p3_tfp" data-i18n="tfp_label">👥 Partisipasi Teamfight</label><input type="number" class="p3-stat pct-input" data-stat="tfp" min="0" max="100" step="1" id="p3_tfp" name="p3_tfp" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" id="p3-tfp-hint" data-i18n="tfp_hint_normal"></span></div>
+      <div class="stat-row" id="p3-tfp-bonus-row" style="display:none;"><label data-i18n="tfp_hint_bonus">⚡ Bonus TFP ≥ 80%</label><span class="val" style="color:var(--gold);font-weight:600;">+5</span></div>
+      <div class="stat-row" id="p3-turtle-row" style="display:none;"><label for="p3_turtle" data-i18n="turtle_label">🐢 Bunuh 3+ Turtle?</label><input type="checkbox" class="p3-stat" data-stat="turtle" id="p3_turtle" name="p3_turtle" onchange="calc()"><span class="formula-hint" data-i18n="turtle_hint"></span></div>
+      <div class="stat-row" id="p3-savage-row" style="display:none;"><label for="p3_savage" data-i18n="savage_label">💀 Dapat Savage?</label><input type="checkbox" class="p3-stat" data-stat="savage" id="p3_savage" name="p3_savage" onchange="calc()"><span class="formula-hint" data-i18n="savage_hint"></span></div>
+      <div class="stat-row"><label for="p3_mvp" data-i18n="mvp_label">🏅 Dapat MVP?</label><input type="checkbox" class="p3-stat" data-stat="mvp" id="p3_mvp" name="p3_mvp" onchange="calc()"><span class="formula-hint" data-i18n="mvp_hint"></span></div>
     </div>
 
     <!-- Player 4 -->
     <div class="player-card" data-player="4">
       <div class="player-header">
-        <span class="player-label-name" data-i18n="player_label">🎮 Player 4</span>
-        <input type="text" class="player-name-input" id="p4_name" placeholder="Nama player" data-i18n-placeholder="player_name_ph">
+        <input type="text" class="player-name-input" id="p4_name" name="p4_name" placeholder="🎮 Nama Player" data-i18n-placeholder="player_name_ph">
         <span class="player-score-small" id="p4-total">0</span>
       </div>
       <div class="role-grid">
         <button class="role-btn active" data-player="4" data-role="exp" onclick="setPlayerRole(4,'exp')" data-i18n="exp_lane">Exp</button>
         <button class="role-btn" data-player="4" data-role="gold" onclick="setPlayerRole(4,'gold')" data-i18n="gold_lane">Gold</button>
         <button class="role-btn" data-player="4" data-role="mid" onclick="setPlayerRole(4,'mid')" data-i18n="mid_lane">Mid</button>
-        <button class="role-btn" data-player="4" data-role="jungler" onclick="setPlayerRole(4,'jungler')" data-i18n="jungler_lane">JG</button>
+        <button class="role-btn" data-player="4" data-role="jungler" onclick="setPlayerRole(4,'jungler')" data-i18n="jungler_lane">Jungler</button>
         <button class="role-btn" data-player="4" data-role="roamer" onclick="setPlayerRole(4,'roamer')" data-i18n="roamer_lane">Roam</button>
       </div>
-      <div class="stat-row"><label data-i18n="kill_label">Kill (+3)</label><input type="number" class="p4-stat" data-stat="kill" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="death_label">Death (-1)</label><input type="number" class="p4-stat" data-stat="death" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="assist_label">Assist (+2)</label><input type="number" class="p4-stat" data-stat="assist" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="dmg_dealt_label">Hero Damage</label><input type="number" class="p4-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row" id="p4-roam-dmg-row" style="display:none;"><label data-i18n="roam_dmg_label">Roam Damage tertinggi?</label><input type="checkbox" class="p4-stat" data-stat="roamDmg" onchange="calc()"></div>
-      <div class="stat-row"><label data-i18n="turret_label">Damage Turret</label><input type="number" class="p4-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row"><label data-i18n="dmg_taken_label">Damage Diterima</label><input type="number" class="p4-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
+      <div class="stat-row"><label for="p4_kill" data-i18n="kill_label">⚔️ Kill (+3)</label><input type="number" class="p4-stat" data-stat="kill" min="0" id="p4_kill" name="p4_kill" oninput="calc()"><span class="formula-hint" data-i18n="kill_hint"></span></div>
+      <div class="stat-row"><label for="p4_death" data-i18n="death_label">💀 Death (-1)</label><input type="number" class="p4-stat" data-stat="death" min="0" id="p4_death" name="p4_death" oninput="calc()"><span class="formula-hint" data-i18n="death_hint"></span></div>
+      <div class="stat-row"><label for="p4_assist" data-i18n="assist_label">🤝 Assist (+2)</label><input type="number" class="p4-stat" data-stat="assist" min="0" id="p4_assist" name="p4_assist" oninput="calc()"><span class="formula-hint" data-i18n="assist_hint"></span></div>
+      <div class="stat-row" id="p4-dmg-dealt-row"><label for="p4_dmgDealt" data-i18n="dmg_dealt_label">🔥 Hero Damage</label><input type="number" class="p4-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" id="p4_dmgDealt" name="p4_dmgDealt" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_dealt_hint"></span></div>
+      <div class="stat-row" id="p4-roam-dmg-row" style="display:none;"><label for="p4_roamDmg" data-i18n="roam_dmg_label">🔥 Roam Damage tertinggi?</label><input type="checkbox" class="p4-stat" data-stat="roamDmg" id="p4_roamDmg" name="p4_roamDmg" onchange="calc()"><span class="formula-hint" data-i18n="roam_dmg_hint"></span></div>
+      <div class="stat-row" id="p4-turret-row"><label for="p4_turretDmg" data-i18n="turret_label">🏯 Damage Turret</label><input type="number" class="p4-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" id="p4_turretDmg" name="p4_turretDmg" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="turret_hint"></span></div>
+      <div class="stat-row" id="p4-dmg-taken-row"><label for="p4_dmgTaken" data-i18n="dmg_taken_label">🛡️ Damage Diterima</label><input type="number" class="p4-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" id="p4_dmgTaken" name="p4_dmgTaken" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_taken_hint_normal"></span></div>
       <div class="stat-row" id="p4-jg-toggle" style="display:none;">
-        <label data-i18n="jungler_type">Tipe JG</label>
+        <label data-i18n="jungler_type">Tipe Jungler</label>
         <button class="subtoggle-btn active" data-player="4" data-jgtype="tank" onclick="setJunglerType(4,'tank')" data-i18n="tank_fighter">Tank</button>
         <button class="subtoggle-btn" data-player="4" data-jgtype="other" onclick="setJunglerType(4,'other')" data-i18n="others">Lain</button>
+        <span class="formula-hint" data-i18n="jungler_dmg_hint"></span>
       </div>
-      <div class="stat-row"><label data-i18n="tfp_label">Partisipasi Teamfight</label><input type="number" class="p4-stat pct-input" data-stat="tfp" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row" id="p4-turtle-row" style="display:none;"><label data-i18n="turtle_label">Bunuh 3+ Turtle?</label><input type="checkbox" class="p4-stat" data-stat="turtle" onchange="calc()"></div>
-      <div class="stat-row" id="p4-savage-row" style="display:none;"><label data-i18n="savage_label">Dapat Savage?</label><input type="checkbox" class="p4-stat" data-stat="savage" onchange="calc()"></div>
-      <div class="stat-row"><label data-i18n="mvp_label">Dapat MVP?</label><input type="checkbox" class="p4-stat" data-stat="mvp" onchange="calc()"></div>
+      <div class="stat-row" id="p4-tfp-row"><label for="p4_tfp" data-i18n="tfp_label">👥 Partisipasi Teamfight</label><input type="number" class="p4-stat pct-input" data-stat="tfp" min="0" max="100" step="1" id="p4_tfp" name="p4_tfp" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" id="p4-tfp-hint" data-i18n="tfp_hint_normal"></span></div>
+      <div class="stat-row" id="p4-tfp-bonus-row" style="display:none;"><label data-i18n="tfp_hint_bonus">⚡ Bonus TFP ≥ 80%</label><span class="val" style="color:var(--gold);font-weight:600;">+5</span></div>
+      <div class="stat-row" id="p4-turtle-row" style="display:none;"><label for="p4_turtle" data-i18n="turtle_label">🐢 Bunuh 3+ Turtle?</label><input type="checkbox" class="p4-stat" data-stat="turtle" id="p4_turtle" name="p4_turtle" onchange="calc()"><span class="formula-hint" data-i18n="turtle_hint"></span></div>
+      <div class="stat-row" id="p4-savage-row" style="display:none;"><label for="p4_savage" data-i18n="savage_label">💀 Dapat Savage?</label><input type="checkbox" class="p4-stat" data-stat="savage" id="p4_savage" name="p4_savage" onchange="calc()"><span class="formula-hint" data-i18n="savage_hint"></span></div>
+      <div class="stat-row"><label for="p4_mvp" data-i18n="mvp_label">🏅 Dapat MVP?</label><input type="checkbox" class="p4-stat" data-stat="mvp" id="p4_mvp" name="p4_mvp" onchange="calc()"><span class="formula-hint" data-i18n="mvp_hint"></span></div>
     </div>
 
     <!-- Player 5 -->
     <div class="player-card" data-player="5">
       <div class="player-header">
-        <span class="player-label-name" data-i18n="player_label">🎮 Player 5</span>
-        <input type="text" class="player-name-input" id="p5_name" placeholder="Nama player" data-i18n-placeholder="player_name_ph">
+        <input type="text" class="player-name-input" id="p5_name" name="p5_name" placeholder="🎮 Nama Player" data-i18n-placeholder="player_name_ph">
         <span class="player-score-small" id="p5-total">0</span>
       </div>
       <div class="role-grid">
         <button class="role-btn active" data-player="5" data-role="exp" onclick="setPlayerRole(5,'exp')" data-i18n="exp_lane">Exp</button>
         <button class="role-btn" data-player="5" data-role="gold" onclick="setPlayerRole(5,'gold')" data-i18n="gold_lane">Gold</button>
         <button class="role-btn" data-player="5" data-role="mid" onclick="setPlayerRole(5,'mid')" data-i18n="mid_lane">Mid</button>
-        <button class="role-btn" data-player="5" data-role="jungler" onclick="setPlayerRole(5,'jungler')" data-i18n="jungler_lane">JG</button>
+        <button class="role-btn" data-player="5" data-role="jungler" onclick="setPlayerRole(5,'jungler')" data-i18n="jungler_lane">Jungler</button>
         <button class="role-btn" data-player="5" data-role="roamer" onclick="setPlayerRole(5,'roamer')" data-i18n="roamer_lane">Roam</button>
       </div>
-      <div class="stat-row"><label data-i18n="kill_label">Kill (+3)</label><input type="number" class="p5-stat" data-stat="kill" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="death_label">Death (-1)</label><input type="number" class="p5-stat" data-stat="death" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="assist_label">Assist (+2)</label><input type="number" class="p5-stat" data-stat="assist" min="0" oninput="calc()"></div>
-      <div class="stat-row"><label data-i18n="dmg_dealt_label">Hero Damage</label><input type="number" class="p5-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row" id="p5-roam-dmg-row" style="display:none;"><label data-i18n="roam_dmg_label">Roam Damage tertinggi?</label><input type="checkbox" class="p5-stat" data-stat="roamDmg" onchange="calc()"></div>
-      <div class="stat-row"><label data-i18n="turret_label">Damage Turret</label><input type="number" class="p5-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row"><label data-i18n="dmg_taken_label">Damage Diterima</label><input type="number" class="p5-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
+      <div class="stat-row"><label for="p5_kill" data-i18n="kill_label">⚔️ Kill (+3)</label><input type="number" class="p5-stat" data-stat="kill" min="0" id="p5_kill" name="p5_kill" oninput="calc()"><span class="formula-hint" data-i18n="kill_hint"></span></div>
+      <div class="stat-row"><label for="p5_death" data-i18n="death_label">💀 Death (-1)</label><input type="number" class="p5-stat" data-stat="death" min="0" id="p5_death" name="p5_death" oninput="calc()"><span class="formula-hint" data-i18n="death_hint"></span></div>
+      <div class="stat-row"><label for="p5_assist" data-i18n="assist_label">🤝 Assist (+2)</label><input type="number" class="p5-stat" data-stat="assist" min="0" id="p5_assist" name="p5_assist" oninput="calc()"><span class="formula-hint" data-i18n="assist_hint"></span></div>
+      <div class="stat-row" id="p5-dmg-dealt-row"><label for="p5_dmgDealt" data-i18n="dmg_dealt_label">🔥 Hero Damage</label><input type="number" class="p5-stat pct-input" data-stat="dmgDealt" min="0" max="100" step="1" id="p5_dmgDealt" name="p5_dmgDealt" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_dealt_hint"></span></div>
+      <div class="stat-row" id="p5-roam-dmg-row" style="display:none;"><label for="p5_roamDmg" data-i18n="roam_dmg_label">🔥 Roam Damage tertinggi?</label><input type="checkbox" class="p5-stat" data-stat="roamDmg" id="p5_roamDmg" name="p5_roamDmg" onchange="calc()"><span class="formula-hint" data-i18n="roam_dmg_hint"></span></div>
+      <div class="stat-row" id="p5-turret-row"><label for="p5_turretDmg" data-i18n="turret_label">🏯 Damage Turret</label><input type="number" class="p5-stat pct-input" data-stat="turretDmg" min="0" max="100" step="1" id="p5_turretDmg" name="p5_turretDmg" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="turret_hint"></span></div>
+      <div class="stat-row" id="p5-dmg-taken-row"><label for="p5_dmgTaken" data-i18n="dmg_taken_label">🛡️ Damage Diterima</label><input type="number" class="p5-stat pct-input" data-stat="dmgTaken" min="0" max="100" step="1" id="p5_dmgTaken" name="p5_dmgTaken" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" data-i18n="dmg_taken_hint_normal"></span></div>
       <div class="stat-row" id="p5-jg-toggle" style="display:none;">
-        <label data-i18n="jungler_type">Tipe JG</label>
+        <label data-i18n="jungler_type">Tipe Jungler</label>
         <button class="subtoggle-btn active" data-player="5" data-jgtype="tank" onclick="setJunglerType(5,'tank')" data-i18n="tank_fighter">Tank</button>
         <button class="subtoggle-btn" data-player="5" data-jgtype="other" onclick="setJunglerType(5,'other')" data-i18n="others">Lain</button>
+        <span class="formula-hint" data-i18n="jungler_dmg_hint"></span>
       </div>
-      <div class="stat-row"><label data-i18n="tfp_label">Partisipasi Teamfight</label><input type="number" class="p5-stat pct-input" data-stat="tfp" min="0" max="100" step="1" oninput="clampPct(this);calc()"><span class="pct-sign">%</span></div>
-      <div class="stat-row" id="p5-turtle-row" style="display:none;"><label data-i18n="turtle_label">Bunuh 3+ Turtle?</label><input type="checkbox" class="p5-stat" data-stat="turtle" onchange="calc()"></div>
-      <div class="stat-row" id="p5-savage-row" style="display:none;"><label data-i18n="savage_label">Dapat Savage?</label><input type="checkbox" class="p5-stat" data-stat="savage" onchange="calc()"></div>
-      <div class="stat-row"><label data-i18n="mvp_label">Dapat MVP?</label><input type="checkbox" class="p5-stat" data-stat="mvp" onchange="calc()"></div>
+      <div class="stat-row" id="p5-tfp-row"><label for="p5_tfp" data-i18n="tfp_label">👥 Partisipasi Teamfight</label><input type="number" class="p5-stat pct-input" data-stat="tfp" min="0" max="100" step="1" id="p5_tfp" name="p5_tfp" oninput="clampPct(this);calc()"><span class="pct-sign">%</span><span class="formula-hint" id="p5-tfp-hint" data-i18n="tfp_hint_normal"></span></div>
+      <div class="stat-row" id="p5-tfp-bonus-row" style="display:none;"><label data-i18n="tfp_hint_bonus">⚡ Bonus TFP ≥ 80%</label><span class="val" style="color:var(--gold);font-weight:600;">+5</span></div>
+      <div class="stat-row" id="p5-turtle-row" style="display:none;"><label for="p5_turtle" data-i18n="turtle_label">🐢 Bunuh 3+ Turtle?</label><input type="checkbox" class="p5-stat" data-stat="turtle" id="p5_turtle" name="p5_turtle" onchange="calc()"><span class="formula-hint" data-i18n="turtle_hint"></span></div>
+      <div class="stat-row" id="p5-savage-row" style="display:none;"><label for="p5_savage" data-i18n="savage_label">💀 Dapat Savage?</label><input type="checkbox" class="p5-stat" data-stat="savage" id="p5_savage" name="p5_savage" onchange="calc()"><span class="formula-hint" data-i18n="savage_hint"></span></div>
+      <div class="stat-row"><label for="p5_mvp" data-i18n="mvp_label">🏅 Dapat MVP?</label><input type="checkbox" class="p5-stat" data-stat="mvp" id="p5_mvp" name="p5_mvp" onchange="calc()"><span class="formula-hint" data-i18n="mvp_hint"></span></div>
     </div>
 
   </div>
@@ -602,7 +603,7 @@
     <div id="history-player-list"><div class="empty-state" data-i18n="empty_state">Belum ada data tersimpan.</div></div>
   </div>
 
-  <footer>SVARGA SYNERGY E-SPORTS &middot; SVS CHAMPIONSHIP &middot; V9.3.0</footer>
+  <footer>SVARGA SYNERGY E-SPORTS &middot; SVS CHAMPIONSHIP &middot; V9.3.14</footer>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -621,32 +622,38 @@ const I18N = {
     match_suffix: 'Match ke-',
     lane_role: 'Lane / Role',
     lineup: 'Lineup Tim',
-    player_label: '🎮 Player',
-    exp_lane: 'Exp', gold_lane: 'Gold', mid_lane: 'Mid', jungler_lane: 'JG', roamer_lane: 'Roam',
+    player_name_ph: '🎮 Nama Player',
+    exp_lane: 'Exp', gold_lane: 'Gold', mid_lane: 'Mid', jungler_lane: 'Jungler', roamer_lane: 'Roam',
     kda: 'KDA',
+    kill_label: '⚔️ Kill',
+    death_label: '💀 Death',
+    assist_label: '🤝 Assist',
+    kill_hint: 'Eliminasi hero lawan',
+    death_hint: 'Kematian dalam match',
+    assist_hint: 'Bantuan eliminasi lawan',
     dmg_dealt_title: 'Hero Damage (%)',
-    dmg_dealt_label: 'Hero Damage',
+    dmg_dealt_label: '🔥 Hero Damage',
     dmg_dealt_hint: '% kontribusi dari total hero damage tim',
     roam_dmg_title: 'Roam Damage (+2)',
-    roam_dmg_label: 'Roam Damage tertinggi?',
-    roam_dmg_hint: 'Centang jika roamer ini damage dealt tertinggi di tim',
+    roam_dmg_label: '🔥 Roam Damage tertinggi?',
+    roam_dmg_hint: 'Centang jika roamer ini damage tertinggi di tim',
     dmg_taken_title: 'Damage Diterima (%)',
-    dmg_taken_label: 'Damage Diterima',
+    dmg_taken_label: '🛡️ Damage Diterima',
     dmg_taken_hint_normal: '% kontribusi dari total damage taken tim',
-    jungler_type: 'Tipe JG', tank_fighter: 'Tank', others: 'Lain',
-    jungler_dmg_hint: 'Damage Taken (+3) hanya berlaku untuk Jungler Tank/Fighter',
+    jungler_type: 'Tipe Jungler', tank_fighter: 'Tank', others: 'Lain',
+    jungler_dmg_hint: 'Damage Taken (+3) hanya untuk Jungler Tank/Fighter',
     turret_title: 'Damage Turret (%)',
-    turret_label: 'Damage Turret',
+    turret_label: '🏯 Damage Turret',
     turret_hint: '% kontribusi dari total turret damage tim',
-    turtle_title: 'Turtle Slayer 3x (+2)', turtle_label: 'Bunuh 3+ Turtle?', turtle_hint: 'Centang jika jungler berkontribusi membunuh Turtle ≥ 3 kali',
+    turtle_title: 'Turtle Slayer 3x (+2)', turtle_label: '🐢 Bunuh 3+ Turtle?', turtle_hint: 'Centang jika jungler bunuh Turtle ≥ 3 kali',
     tfp_title: 'Partisipasi Teamfight (%)',
-    tfp_label: 'Partisipasi Teamfight',
-    tfp_hint_bonus: '≥ 80% mendapat bonus tambahan +5',
+    tfp_label: '👥 Partisipasi Teamfight',
+    tfp_hint_bonus: '⚡ Bonus TFP ≥ 80% (+5 otomatis)',
     tfp_hint_normal: '% teamfight yang diikuti dari total teamfight tim',
-    savage_title: 'Savage (+5)', savage_label: 'Dapat Savage?', savage_hint: 'Centang jika player mendapatkan Savage di match ini',
+    savage_title: 'Savage (+5)', savage_label: '💀 Dapat Savage?', savage_hint: 'Centang jika player dapat Savage di match ini',
     mvp_title: 'MVP (+5)',
-    mvp_label: 'Dapat MVP?',
-    mvp_hint: 'Centang jika player mendapatkan MVP di match ini',
+    mvp_label: '🏅 Dapat MVP?',
+    mvp_hint: 'Centang jika player terpilih sebagai MVP',
     total_score: 'Total Tim',
     target_label: '🎯 Target',
     target_hint: 'Masukkan target skor',
@@ -658,10 +665,11 @@ const I18N = {
     history_title: 'Riwayat Skor', per_match: 'Per Match', per_player: 'Per Player',
     empty_state: 'Belum ada data tersimpan.',
     role_labels: { exp:'EXP LANE', gold:'GOLD LANE', mid:'MID LANE', jungler:'JUNGLER', roamer:'ROAMER' },
-    kill_label: 'Kill', death_label: 'Death', assist_label: 'Assist',
-    toast_saved: '✅ Tim disimpan!', toast_copied: '📋 Disalin ke clipboard!', toast_cleared: '🗑️ Riwayat dihapus',
+    toast_saved: '✅ Tim disimpan!', toast_copied: '📋 Disalin ke clipboard!', toast_cleared: '🗑️ Riwayat dihapus', toast_no_data: '⚠️ Isi data terlebih dahulu', toast_empty_name: '⚠️ Semua player harus diisi nama', toast_no_export: '⚠️ Tidak ada data untuk diekspor', toast_no_copy_data: '⚠️ Tidak ada data untuk disalin',
     toast_csv_exported: '📊 CSV berhasil diekspor!',
     confirm_clear: 'Hapus semua riwayat skor?',
+    confirm_dup_role: 'Ada role yang sama dipakai lebih dari 1 player: {roles}. Tetap simpan?',
+    warn_no_name: 'Stat sudah diisi tapi nama player belum diisi — poin ini belum masuk ke total tim',
     copy_header: 'SVS CHAMPIONSHIP — SKOR TIM',
   },
   en: {
@@ -673,31 +681,37 @@ const I18N = {
     match_suffix: 'Match #',
     lane_role: 'Lane / Role',
     lineup: 'Team Lineup',
-    player_label: '🎮 Player',
-    exp_lane: 'Exp', gold_lane: 'Gold', mid_lane: 'Mid', jungler_lane: 'JG', roamer_lane: 'Roam',
+    player_name_ph: '🎮 Player Name',
+    exp_lane: 'Exp', gold_lane: 'Gold', mid_lane: 'Mid', jungler_lane: 'Jungler', roamer_lane: 'Roam',
     kda: 'KDA',
+    kill_label: '⚔️ Kill',
+    death_label: '💀 Death',
+    assist_label: '🤝 Assist',
+    kill_hint: 'Enemy hero eliminations',
+    death_hint: 'Deaths in match',
+    assist_hint: 'Assists in eliminations',
     dmg_dealt_title: 'Hero Damage (%)',
-    dmg_dealt_label: 'Hero Damage',
+    dmg_dealt_label: '🔥 Hero Damage',
     dmg_dealt_hint: '% contribution of total team hero damage',
     roam_dmg_title: 'Roam Damage (+2)',
-    roam_dmg_label: 'Highest Roam Damage?',
-    roam_dmg_hint: 'Check if this roamer has the highest damage dealt on the team',
+    roam_dmg_label: '🔥 Highest Roam Damage?',
+    roam_dmg_hint: 'Check if roamer has highest damage on team',
     dmg_taken_title: 'Damage Taken (%)',
-    dmg_taken_label: 'Damage Taken',
+    dmg_taken_label: '🛡️ Damage Taken',
     dmg_taken_hint_normal: '% contribution of total team damage taken',
-    jungler_type: 'JG Type', tank_fighter: 'Tank', others: 'Other',
-    jungler_dmg_hint: 'Damage Taken (+3) only applies to Tank/Fighter Junglers',
+    jungler_type: 'Jungler Type', tank_fighter: 'Tank', others: 'Other',
+    jungler_dmg_hint: 'Damage Taken (+3) only for Tank/Fighter Junglers',
     turret_title: 'Turret Damage (%)',
-    turret_label: 'Turret Damage',
+    turret_label: '🏯 Turret Damage',
     turret_hint: '% contribution of total team turret damage',
-    turtle_title: 'Turtle Slayer 3x (+2)', turtle_label: 'Killed 3+ Turtles?', turtle_hint: 'Check if this jungler contributed to killing Turtle ≥ 3 times',
+    turtle_title: 'Turtle Slayer 3x (+2)', turtle_label: '🐢 Killed 3+ Turtles?', turtle_hint: 'Check if jungler killed Turtle ≥ 3 times',
     tfp_title: 'Teamfight Participation (%)',
-    tfp_label: 'Teamfight Participation',
-    tfp_hint_bonus: '≥ 80% gets an additional +5 bonus',
-    tfp_hint_normal: '% of teamfights joined out of total team teamfights',
-    savage_title: 'Savage (+5)', savage_label: 'Got Savage?', savage_hint: 'Check if the player got a Savage in this match',
+    tfp_label: '👥 Teamfight Participation',
+    tfp_hint_bonus: '⚡ Bonus TFP ≥ 80% (+5 automatic)',
+    tfp_hint_normal: '% of teamfights joined out of total',
+    savage_title: 'Savage (+5)', savage_label: '💀 Got Savage?', savage_hint: 'Check if the player got a Savage in this match',
     mvp_title: 'MVP (+5)',
-    mvp_label: 'Got MVP?',
+    mvp_label: '🏅 Got MVP?',
     mvp_hint: 'Check if the player got MVP in this match',
     total_score: 'Team Total',
     target_label: '🎯 Target',
@@ -710,10 +724,11 @@ const I18N = {
     history_title: 'Score History', per_match: 'Per Match', per_player: 'Per Player',
     empty_state: 'No saved data yet.',
     role_labels: { exp:'EXP LANE', gold:'GOLD LANE', mid:'MID LANE', jungler:'JUNGLER', roamer:'ROAMER' },
-    kill_label: 'Kill', death_label: 'Death', assist_label: 'Assist',
-    toast_saved: '✅ Team saved!', toast_copied: '📋 Copied to clipboard!', toast_cleared: '🗑️ History cleared',
+    toast_saved: '✅ Team saved!', toast_copied: '📋 Copied to clipboard!', toast_cleared: '🗑️ History cleared', toast_no_data: '⚠️ Please fill in the data first', toast_empty_name: '⚠️ All players must have a name', toast_no_export: '⚠️ No data to export', toast_no_copy_data: '⚠️ No data to copy',
     toast_csv_exported: '📊 CSV exported successfully!',
     confirm_clear: 'Clear all score history?',
+    confirm_dup_role: 'The same role is used by more than 1 player: {roles}. Save anyway?',
+    warn_no_name: 'Stats filled but player name is missing — these points are not included in the team total',
     copy_header: 'SVS CHAMPIONSHIP — TEAM SCORE',
   }
 };
@@ -725,6 +740,7 @@ function setLang(lang) {
   document.getElementById('lang-id').className = 'lang-btn' + (lang==='id' ? ' active' : '');
   document.getElementById('lang-en').className = 'lang-btn' + (lang==='en' ? ' active' : '');
   applyTranslations();
+  calc(); // Fix: refresh tooltip warning (title attribute) biar ikut bahasa terbaru
   localStorage.setItem('svs_lang', lang);
 }
 
@@ -737,8 +753,20 @@ function applyTranslations() {
     const key = el.getAttribute('data-i18n-placeholder');
     el.setAttribute('placeholder', t(key));
   });
+  updateAllTfpHints();
   updateTargetStatus();
   renderHistory();
+}
+
+function updateAllTfpHints() {
+  for (let i = 1; i <= 5; i++) {
+    const role = playerState[i]?.role || 'exp';
+    const cfg = CONFIG[role];
+    const hintEl = document.getElementById(`p${i}-tfp-hint`);
+    if (hintEl) {
+      hintEl.textContent = cfg.showTfpBonus ? t('tfp_hint_bonus') : t('tfp_hint_normal');
+    }
+  }
 }
 
 function updateTargetStatus() {
@@ -762,14 +790,14 @@ function updateTargetStatus() {
 
 // ── PLAYER CONFIG ──────────────────────────────────────────────────────────────
 const CONFIG = {
-  exp:     { label:'EXP LANE',    kill:3, assist:2, death:-1, dmgDealt:4, dmgTaken:3, turret:2, tfp:3, showDmgDealt:true,  showDmgTaken:true,  showTurret:true,  showRoamDmg:false, showJunglerToggle:false, showTurtleSlayer:false, showSavage:false, showTfpBonus:false, showMvp:true },
-  gold:    { label:'GOLD LANE',   kill:3, assist:1, death:-2, dmgDealt:4, dmgTaken:0, turret:2, tfp:2, showDmgDealt:true,  showDmgTaken:false, showTurret:true,  showRoamDmg:false, showJunglerToggle:false, showTurtleSlayer:false, showSavage:true,  showTfpBonus:false, showMvp:true },
-  mid:     { label:'MID LANE',    kill:3, assist:2, death:-1, dmgDealt:4, dmgTaken:0, turret:0, tfp:3, showDmgDealt:true,  showDmgTaken:false, showTurret:false, showRoamDmg:false, showJunglerToggle:false, showTurtleSlayer:false, showSavage:true,  showTfpBonus:false, showMvp:true },
-  jungler: { label:'JUNGLER',     kill:3, assist:1, death:-2, dmgDealt:4, dmgTaken:3, turret:2, tfp:2, showDmgDealt:true,  showDmgTaken:true,  showTurret:true,  showRoamDmg:false, showJunglerToggle:true,  showTurtleSlayer:true,  showSavage:true,  showTfpBonus:false, showMvp:true },
-  roamer:  { label:'ROAMER',      kill:1, assist:2, death:-1, dmgDealt:0, dmgTaken:3, turret:0, tfp:3, showDmgDealt:false, showDmgTaken:true,  showTurret:false, showRoamDmg:true,  showJunglerToggle:false, showTurtleSlayer:false, showSavage:false, showTfpBonus:true,  showMvp:true },
+  exp:     { label:'EXP LANE',    kill:3, assist:2, death:-1, dmgDealt:4, dmgTaken:3, turret:2, tfp:3, showDmgDealt:true,  showDmgTaken:true,  showTurret:true,  showRoamDmg:false, showJunglerToggle:false, showTurtleSlayer:false, showSavage:false, showTfpBonus:false, showMvp:true, showTfp:true },
+  gold:    { label:'GOLD LANE',   kill:3, assist:1, death:-2, dmgDealt:4, dmgTaken:0, turret:2, tfp:2, showDmgDealt:true,  showDmgTaken:false, showTurret:true,  showRoamDmg:false, showJunglerToggle:false, showTurtleSlayer:false, showSavage:true,  showTfpBonus:false, showMvp:true, showTfp:true },
+  mid:     { label:'MID LANE',    kill:3, assist:2, death:-1, dmgDealt:4, dmgTaken:0, turret:0, tfp:3, showDmgDealt:true,  showDmgTaken:false, showTurret:false, showRoamDmg:false, showJunglerToggle:false, showTurtleSlayer:false, showSavage:true,  showTfpBonus:false, showMvp:true, showTfp:true },
+  jungler: { label:'JUNGLER',     kill:3, assist:1, death:-2, dmgDealt:4, dmgTaken:3, turret:2, tfp:2, showDmgDealt:true,  showDmgTaken:true,  showTurret:true,  showRoamDmg:false, showJunglerToggle:true,  showTurtleSlayer:true,  showSavage:true,  showTfpBonus:false, showMvp:true, showTfp:true },
+  roamer:  { label:'ROAMER',      kill:1, assist:2, death:-1, dmgDealt:0, dmgTaken:3, turret:0, tfp:3, showDmgDealt:false, showDmgTaken:true,  showTurret:false, showRoamDmg:true,  showJunglerToggle:false, showTurtleSlayer:false, showSavage:false, showTfpBonus:true,  showMvp:true, showTfp:true },
 };
 
-// Player state: each player has a role and junglerType
+// Player state
 const playerState = {
   1: { role: 'exp', junglerType: 'tank' },
   2: { role: 'exp', junglerType: 'tank' },
@@ -780,12 +808,18 @@ const playerState = {
 
 function setPlayerRole(player, role) {
   playerState[player].role = role;
-  // Update buttons
   document.querySelectorAll(`.player-card[data-player="${player}"] .role-btn`).forEach(btn => {
     btn.classList.toggle('active', btn.dataset.role === role);
   });
-  // Update UI for this player
+  // Fix: reset checkbox stat (roam damage, turtle slayer, savage) saat ganti role
+  // agar tidak ada nilai "nyangkut" dari role sebelumnya.
+  // MVP TIDAK direset karena berlaku universal di semua role.
+  ['roamDmg', 'turtle', 'savage'].forEach(stat => {
+    const el = document.querySelector(`.p${player}-stat[data-stat="${stat}"]`);
+    if (el && el.type === 'checkbox') el.checked = false;
+  });
   updatePlayerUI(player);
+  updateAllTfpHints();
   calc();
 }
 
@@ -800,18 +834,21 @@ function setJunglerType(player, type) {
 function updatePlayerUI(player) {
   const cfg = CONFIG[playerState[player].role];
   if (!cfg) return;
-  const card = document.querySelector(`.player-card[data-player="${player}"]`);
-  if (!card) return;
-
-  // Show/hide rows
-  const roamRow = document.getElementById(`p${player}-roam-dmg-row`);
-  if (roamRow) roamRow.style.display = cfg.showRoamDmg ? 'flex' : 'none';
-  const jgToggle = document.getElementById(`p${player}-jg-toggle`);
-  if (jgToggle) jgToggle.style.display = cfg.showJunglerToggle ? 'flex' : 'none';
-  const turtleRow = document.getElementById(`p${player}-turtle-row`);
-  if (turtleRow) turtleRow.style.display = cfg.showTurtleSlayer ? 'flex' : 'none';
-  const savageRow = document.getElementById(`p${player}-savage-row`);
-  if (savageRow) savageRow.style.display = cfg.showSavage ? 'flex' : 'none';
+  const rows = {
+    'dmg-dealt': cfg.showDmgDealt,
+    'dmg-taken': cfg.showDmgTaken,
+    'turret': cfg.showTurret,
+    'tfp': true,
+    'tfp-bonus': cfg.showTfpBonus,
+    'roam-dmg': cfg.showRoamDmg,
+    'jg-toggle': cfg.showJunglerToggle,
+    'turtle': cfg.showTurtleSlayer,
+    'savage': cfg.showSavage
+  };
+  Object.keys(rows).forEach(key => {
+    const el = document.getElementById(`p${player}-${key}-row`);
+    if (el) el.style.display = rows[key] ? 'flex' : 'none';
+  });
 }
 
 function getPlayerStat(player, stat) {
@@ -880,8 +917,22 @@ function calc() {
   for (let i = 1; i <= 5; i++) {
     const result = calcPlayer(i);
     players.push(result);
-    totalTeam += result.total;
-    document.getElementById(`p${i}-total`).textContent = result.total.toFixed(1);
+    // Fix: total tim cuma hitung player yang namanya udah diisi,
+    // biar konsisten sama yang bakal disimpan (getFilledPlayers).
+    // Skor per-card tetap ditampilkan live meski nama belum diisi (feedback saat mengetik).
+    const scoreEl = document.getElementById(`p${i}-total`);
+    if (result.name && result.name.trim() !== '') {
+      totalTeam += result.total;
+      scoreEl.textContent = result.total.toFixed(1);
+      scoreEl.removeAttribute('title');
+    } else if (result.total !== 0) {
+      // Stat sudah diisi tapi nama belum — kasih peringatan visual, poin belum ikut total tim
+      scoreEl.textContent = '⚠️ ' + result.total.toFixed(1);
+      scoreEl.setAttribute('title', t('warn_no_name'));
+    } else {
+      scoreEl.textContent = result.total.toFixed(1);
+      scoreEl.removeAttribute('title');
+    }
   }
   totalTeam = parseFloat(totalTeam.toFixed(1));
   document.getElementById('total-team-score').textContent = totalTeam;
@@ -920,8 +971,6 @@ function calc() {
   breakdownDiv.innerHTML = html;
 
   updateTargetStatus();
-
-  // Save result for save/copy
   lastMatchResult = {
     team: teamName,
     match: matchNum,
@@ -949,22 +998,51 @@ function loadTargetForTeam(team) {
   updateTargetStatus();
 }
 
+// ── HELPER: VALIDASI ROSTER ─────────────────────────────────────────────────
+// Kembalikan player yang namanya terisi (izinkan kurang dari 5 player, skip slot kosong)
+function getFilledPlayers() {
+  if (!lastMatchResult) return [];
+  return lastMatchResult.players.filter(p => p.name && p.name.trim() !== '');
+}
+
+// Cek duplikat role di antara player yang terisi. Return array role yang dobel, atau [] kalau aman.
+function findDuplicateRoles(players) {
+  const seen = {};
+  const dupes = new Set();
+  players.forEach(p => {
+    if (seen[p.role]) dupes.add(p.role);
+    seen[p.role] = true;
+  });
+  return Array.from(dupes);
+}
+
 // ── SAVE ──────────────────────────────────────────────────────────────────────
 function saveEntry() {
-  if (!lastMatchResult) { showToast('Isi data terlebih dahulu', '#8B3030'); return; }
-  // Ensure all players have names
-  let hasEmpty = false;
-  for (let i = 1; i <= 5; i++) {
-    const name = document.getElementById(`p${i}_name`).value.trim();
-    if (!name) { hasEmpty = true; break; }
-  }
-  if (hasEmpty) {
-    showToast('Semua player harus diisi nama', '#8B3030');
+  if (!lastMatchResult) { showToast(t('toast_no_data'), '#8B3030'); return; }
+
+  const filled = getFilledPlayers();
+  if (filled.length === 0) {
+    showToast(t('toast_empty_name'), '#8B3030');
     return;
   }
+
+  const dupes = findDuplicateRoles(filled);
+  if (dupes.length > 0) {
+    const roleNames = dupes.map(r => t('role_labels')[r]).join(', ');
+    const msg = t('confirm_dup_role').replace('{roles}', roleNames);
+    if (!confirm(msg)) return;
+  }
+
+  // Simpan cuma player yang namanya terisi (mendukung < 5 player)
+  const entryToSave = {
+    ...lastMatchResult,
+    players: filled,
+    total: parseFloat(filled.reduce((sum, p) => sum + p.total, 0).toFixed(1))
+  };
+
   let data = [];
   try { data = JSON.parse(localStorage.getItem('svs_history') || '[]'); } catch(e) {}
-  data.push(lastMatchResult);
+  data.push(entryToSave);
   localStorage.setItem('svs_history', JSON.stringify(data));
   showToast(t('toast_saved'));
   renderHistory();
@@ -988,10 +1066,8 @@ function clearAllHistory() {
 function renderHistory() {
   let data = [];
   try { data = JSON.parse(localStorage.getItem('svs_history') || '[]'); } catch(e) {}
-  // Migrate old single-player data
   data = data.map(entry => {
-    if (entry.players) return entry; // already multi
-    // convert single to multi
+    if (entry.players) return entry;
     return {
       team: entry.team || '',
       match: entry.match || 1,
@@ -1084,16 +1160,24 @@ function exportCSV() {
       ts: entry.ts || Date.now()
     };
   });
-  if (!data.length) { showToast('Tidak ada data untuk diekspor', '#8B3030'); return; }
+  if (!data.length) { showToast(t('toast_no_export'), '#8B3030'); return; }
   const headers = ['Team','Match','Player','Role','Kill','Death','Assist','DamageDealt','DamageTaken','Turret','RoamDamage','TurtleSlayer','Savage','MVP','TFP','TFPBonus','Total'];
+  // Fix: escape field CSV yang mengandung koma, quote, atau newline
+  function csvEscape(val) {
+    const str = String(val);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+  }
   const rows = [];
   data.forEach(entry => {
     entry.players.forEach(p => {
       const b = p.breakdown || {};
       rows.push([
-        entry.team || '',
+        csvEscape(entry.team || ''),
         entry.match || '',
-        p.name || '',
+        csvEscape(p.name || ''),
         p.role || '',
         b.bKill || 0,
         b.bDeath || 0,
@@ -1124,16 +1208,20 @@ function exportCSV() {
 
 // ── COPY TO CLIPBOARD ────────────────────────────────────────────────────────
 function copyToClipboard() {
-  if (!lastMatchResult) { showToast('Tidak ada data', '#8B3030'); return; }
+  if (!lastMatchResult) { showToast(t('toast_no_copy_data'), '#8B3030'); return; }
+  const filled = getFilledPlayers();
+  if (filled.length === 0) { showToast(t('toast_empty_name'), '#8B3030'); return; }
+
   const r = lastMatchResult;
+  const teamTotal = parseFloat(filled.reduce((sum, p) => sum + p.total, 0).toFixed(1));
   let txt = `╔══ ${t('copy_header')} ══╗\n`;
   txt += `🏷️ ${r.team} | ${t('match')} ${r.match}\n`;
   txt += `─────────────────────────────────\n`;
-  r.players.forEach(p => {
+  filled.forEach(p => {
     const br = p.breakdown;
     const cfg = CONFIG[p.role];
     txt += `\n👤 ${p.name} — ${t('role_labels')[p.role]}\n`;
-    txt += `   Kill (+3)      : +${br.bKill}\n`;
+    txt += `   Kill (+${cfg.kill})      : +${br.bKill}\n`;
     txt += `   Death (${cfg.death})     : ${br.bDeath}\n`;
     txt += `   Assist (+${cfg.assist})    : +${br.bAssist}\n`;
     if (cfg.showDmgDealt)    txt += `   Hero Damage   : +${br.bDmgDealt.toFixed(2)}\n`;
@@ -1149,7 +1237,7 @@ function copyToClipboard() {
     txt += `   TOTAL PLAYER   : ${p.total}\n`;
   });
   txt += `─────────────────────────────────\n`;
-  txt += `📊 ${t('total_score').toUpperCase()}        : ${r.total}\n`;
+  txt += `📊 ${t('total_score').toUpperCase()}        : ${teamTotal}\n`;
   txt += `╚════════════════════════════════╝`;
 
   navigator.clipboard.writeText(txt).then(() => showToast(t('toast_copied')))
@@ -1180,10 +1268,8 @@ document.getElementById('team_name').addEventListener('input', function() {
 });
 document.getElementById('match_num').addEventListener('input', calc);
 
-// Init all player UI
 for (let i = 1; i <= 5; i++) {
   updatePlayerUI(i);
-  // Add input listeners for all stats
   document.querySelectorAll(`.p${i}-stat`).forEach(el => {
     el.addEventListener('input', calc);
     el.addEventListener('change', calc);
