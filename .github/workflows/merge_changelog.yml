@@ -14,6 +14,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: true
+          fetch-depth: 0
+
+      - name: Install jq for Discord payload formatting
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -30,7 +36,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if [ -n "$(git status --porcelain)" ]; then
             git add CHANGELOG.md
-            git commit -m "chore(changelog): regenerate archived logs via workflow"
+            git commit -m "chore(changelog): regenerate archived logs via workflow [skip ci]"
             git push
           else
             echo "No changes to commit"
