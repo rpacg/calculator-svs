@@ -2,7 +2,7 @@ from pathlib import Path
 import re
 import sys
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 INDEX_FILE = ROOT / "index.html"
 ARCHIVE_DIR = ROOT / "archives" / "html-versions"
 

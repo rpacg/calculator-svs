@@ -4,7 +4,7 @@ import sys
 import time
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 ARCHIVE_DIR = ROOT / "archives" / "html-versions"
 VERSION_PATTERN = re.compile(r"^Score Calculator SVS v\d+(?:\.\d+)+\.html$")
 
