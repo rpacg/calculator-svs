@@ -35,3 +35,20 @@ jobs:
           else
             echo "No changes to commit"
           fi
+
+      - name: Notify Discord (optional)
+        if: ${{ secrets.DISCORD_WEBHOOK_URL != '' }}
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          REPO: ${{ github.repository }}
+          REF: ${{ github.ref }}
+          SHA: ${{ github.sha }}
+          ACTOR: ${{ github.actor }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -n "$DISCORD_WEBHOOK_URL" ]; then
+            PAYLOAD=$(jq -n --arg repo "$REPO" --arg ref "$REF" --arg sha "$SHA" --arg actor "$ACTOR" --arg url "$RUN_URL" '{username: "changelog-bot", embeds: [{ title: "CHANGELOG updated", description: ("Repository: " + $repo + "\nRef: " + $ref + "\nCommit: " + $sha + "\nActor: " + $actor), url: $url, color: 3066993 }] }')
+            curl -s -H "Content-Type: application/json" -d "$PAYLOAD" "$DISCORD_WEBHOOK_URL"
+          else
+            echo "DISCORD_WEBHOOK_URL not set, skipping"
+          fi
