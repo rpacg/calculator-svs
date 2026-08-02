@@ -4,10 +4,11 @@ import sys
 
 ROOT = Path(__file__).resolve().parent
 INDEX_FILE = ROOT / "index.html"
+ARCHIVE_DIR = ROOT / "archives" / "html-versions"
 
 
 def sync_index_to_latest_version(root: Path, index_path: Path):
-    version_files = sorted(root.glob("Score Calculator SVS v*.html"))
+    version_files = sorted(list((root / "archives" / "html-versions").glob("Score Calculator SVS v*.html")))
     version = latest_version(version_files)
     if version is None:
         return False, None

@@ -5,12 +5,13 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
+ARCHIVE_DIR = ROOT / "archives" / "html-versions"
 VERSION_PATTERN = re.compile(r"^Score Calculator SVS v\d+(?:\.\d+)+\.html$")
 
 
 def discover_versions(root: Path):
     items = {}
-    for path in root.glob("Score Calculator SVS v*.html"):
+    for path in sorted(ARCHIVE_DIR.glob("Score Calculator SVS v*.html")):
         if VERSION_PATTERN.match(path.name):
             items[path.name] = path.stat().st_mtime_ns
     return items
