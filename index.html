@@ -194,6 +194,16 @@
   .history-meta { font-size: 10px; color: var(--text-secondary); margin-bottom: 2px; }
   .history-del { background: none; border: none; color: var(--neg); cursor: pointer; font-size: 12px; padding: 2px 4px; }
   .match-label { font-size: 10px; font-weight: 700; color: #7A6E54; text-transform: uppercase; letter-spacing: 0.08em; margin: 10px 0 4px; }
+  .history-chart-card { background: rgba(15,12,9,0.9); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+  .history-chart-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .history-chart-title { font-size: 13px; font-weight: 700; color: var(--gold); }
+  .history-chart-select { min-width: 170px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--text-primary); font-size: 12px; }
+  .history-chart { display: grid; grid-template-columns: repeat(auto-fit,minmax(80px,1fr)); gap: 8px; align-items: end; min-height: 120px; }
+  .history-chart-bar { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .history-chart-bar .bar { width: 100%; background: linear-gradient(180deg, rgba(237,187,91,0.95), rgba(179,122,38,0.95)); border-radius: 12px 12px 0 0; transition: height 0.25s ease; }
+  .history-chart-bar .bar-label { font-size: 11px; color: var(--text-primary); font-weight: 700; }
+  .history-chart-bar .bar-meta { font-size: 10px; color: var(--text-secondary); text-align: center; white-space: normal; }
+  .history-chart.empty { min-height: 60px; }
   .player-total { background: rgba(30,22,10,0.9); border: 1px solid #5A4826; border-radius: 8px; padding: 8px 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
   .player-total .name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
   .player-total .matches { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
@@ -597,6 +607,17 @@
   </div>
 
   <div id="tab-match" class="tab-content active">
+    <div class="history-chart-card">
+      <div class="history-chart-header">
+        <span class="history-chart-title" data-i18n="history_trend">Tren Skor</span>
+        <select id="history-metric-select" class="history-chart-select" onchange="renderHistory()">
+          <option value="total" data-i18n="trend_total_score">Rata-rata Total Skor</option>
+          <option value="kill" data-i18n="trend_avg_kill">Rata-rata Kill</option>
+          <option value="damage" data-i18n="trend_avg_damage">Rata-rata Damage</option>
+        </select>
+      </div>
+      <div id="history-chart" class="history-chart"></div>
+    </div>
     <div id="history-match-list"><div class="empty-state" data-i18n="empty_state">Belum ada data tersimpan.</div></div>
   </div>
   <div id="tab-player" class="tab-content">
@@ -663,6 +684,10 @@ const I18N = {
     total: 'Total',
     save_btn: '💾 Simpan Tim', copy_btn: '📋 Salin Detail', pdf_btn: '📄 Export PDF', export_csv_btn: '📊 Export CSV', clear_btn: '🗑️ Hapus Semua Riwayat',
     history_title: 'Riwayat Skor', per_match: 'Per Match', per_player: 'Per Player',
+    history_trend: 'Tren Skor',
+    trend_total_score: 'Rata-rata Total Skor',
+    trend_avg_kill: 'Rata-rata Kill',
+    trend_avg_damage: 'Rata-rata Damage',
     empty_state: 'Belum ada data tersimpan.',
     role_labels: { exp:'EXP LANE', gold:'GOLD LANE', mid:'MID LANE', jungler:'JUNGLER', roamer:'ROAMER' },
     toast_saved: '✅ Tim disimpan!', toast_copied: '📋 Disalin ke clipboard!', toast_cleared: '🗑️ Riwayat dihapus', toast_no_data: '⚠️ Isi data terlebih dahulu', toast_empty_name: '⚠️ Semua player harus diisi nama', toast_no_export: '⚠️ Tidak ada data untuk diekspor', toast_no_copy_data: '⚠️ Tidak ada data untuk disalin',
@@ -722,6 +747,10 @@ const I18N = {
     total: 'Total',
     save_btn: '💾 Save Team', copy_btn: '📋 Copy Details', pdf_btn: '📄 Export PDF', export_csv_btn: '📊 Export CSV', clear_btn: '🗑️ Clear All History',
     history_title: 'Score History', per_match: 'Per Match', per_player: 'Per Player',
+    history_trend: 'Trend Score',
+    trend_total_score: 'Average Total Score',
+    trend_avg_kill: 'Average Kill',
+    trend_avg_damage: 'Average Damage',
     empty_state: 'No saved data yet.',
     role_labels: { exp:'EXP LANE', gold:'GOLD LANE', mid:'MID LANE', jungler:'JUNGLER', roamer:'ROAMER' },
     toast_saved: '✅ Team saved!', toast_copied: '📋 Copied to clipboard!', toast_cleared: '🗑️ History cleared', toast_no_data: '⚠️ Please fill in the data first', toast_empty_name: '⚠️ All players must have a name', toast_no_export: '⚠️ No data to export', toast_no_copy_data: '⚠️ No data to copy',
@@ -1113,6 +1142,8 @@ function renderHistory() {
     `).join('');
   }
 
+  renderHistoryChart(data);
+
   // Per Player
   const playerEl = document.getElementById('history-player-list');
   if (!data.length) {
@@ -1141,6 +1172,57 @@ function renderHistory() {
 }
 
 // ── EXPORT CSV ────────────────────────────────────────────────────────────────
+function renderHistoryChart(data) {
+  const chartEl = document.getElementById('history-chart');
+  if (!chartEl) return;
+  const metric = document.getElementById('history-metric-select')?.value || 'total';
+  if (!data.length) {
+    chartEl.innerHTML = `<div class="empty-state">${t('empty_state')}</div>`;
+    chartEl.classList.add('empty');
+    return;
+  }
+
+  const byMatch = {};
+  data.forEach(entry => {
+    const key = `${entry.match}|${entry.team}`;
+    if (!byMatch[key]) {
+      byMatch[key] = { match: entry.match, team: entry.team, players: [] };
+    }
+    byMatch[key].players.push(...entry.players);
+  });
+
+  const points = Object.values(byMatch)
+    .sort((a, b) => a.match - b.match || a.team.localeCompare(b.team))
+    .map(entry => {
+      const count = entry.players.length || 1;
+      const totalScore = entry.players.reduce((sum, p) => sum + (p.total || 0), 0);
+      const avgTotal = totalScore / count;
+      const avgKill = entry.players.reduce((sum, p) => sum + ((p.breakdown?.bKill || 0)), 0) / count;
+      const avgDamage = entry.players.reduce((sum, p) => sum + ((p.breakdown?.bDmgDealt || 0) + (p.breakdown?.bTurret || 0) + (p.breakdown?.bDmgTaken || 0)), 0) / count;
+      return {
+        label: `M${entry.match} ${entry.team}`,
+        total: avgTotal,
+        kill: avgKill,
+        damage: avgDamage
+      };
+    });
+
+  const values = points.map(p => metric === 'kill' ? p.kill : metric === 'damage' ? p.damage : p.total);
+  const maxValue = Math.max(...values, 1);
+  chartEl.classList.remove('empty');
+  chartEl.innerHTML = points.map(point => {
+    const value = metric === 'kill' ? point.kill : metric === 'damage' ? point.damage : point.total;
+    const height = Math.round((value / maxValue) * 100);
+    return `
+      <div class="history-chart-bar">
+        <div class="bar" style="height:${height}%;"></div>
+        <div class="bar-label">${value.toFixed(1)}</div>
+        <div class="bar-meta">${point.label}</div>
+      </div>
+    `;
+  }).join('');
+}
+
 function exportCSV() {
   let data = [];
   try { data = JSON.parse(localStorage.getItem('svs_history') || '[]'); } catch(e) {}
