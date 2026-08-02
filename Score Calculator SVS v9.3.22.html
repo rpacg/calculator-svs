@@ -312,6 +312,33 @@
     .tab-content { display: block !important; }
   }
 
+  @media (max-width: 767px) {
+    body { padding: 54px 8px 24px; }
+    .lang-toggle { top: 8px; right: 8px; }
+    .league-title { padding-right: 0; margin-bottom: 12px; }
+    .league-title .main { font-size: 16px; }
+    .league-title .sub { font-size: 10px; }
+    .card { padding: 12px; }
+    .row { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .row label { min-width: 0; width: 100%; font-size: 12px; }
+    .row input[type=number], .row input[type=text] { width: 100%; max-width: 100%; }
+    .row input[type=number] { width: 100%; }
+    .pct-input { width: 100% !important; max-width: 100px; }
+    .action-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .mode-btn, .subtoggle-btn, .tab-btn { font-size: 10px; padding: 8px 6px; }
+    .player-card .player-header { flex-direction: column; align-items: stretch; }
+    .player-card .player-name-input { min-width: 0; }
+    .player-card .role-grid { grid-template-columns: repeat(3, 1fr); }
+    .player-card .stat-row label { min-width: 60px; }
+    .player-card .stat-row input[type=number] { width: 100%; max-width: 70px; }
+    .player-card .player-score-small { text-align: left; min-width: 0; }
+  }
+
+  @media (max-width: 480px) {
+    .action-grid { grid-template-columns: 1fr; }
+    .player-card .role-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
   .lang-toggle { 
     position: fixed; 
     top: 10px; 
