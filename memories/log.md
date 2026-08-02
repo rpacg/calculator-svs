@@ -13,3 +13,4 @@
 ## Change summary
 - Created new file: `Score Calculator SVS v9.3.19.html`
 - Updated title and footer metadata from `v9.3.18` to `v9.3.19`
+- Created new release file `Score Calculator SVS v9.3.21.html` with updated header/footer branding and version metadata.
