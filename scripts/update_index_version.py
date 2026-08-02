@@ -1,10 +1,12 @@
 from pathlib import Path
+from datetime import date
 import re
 import sys
 
 ROOT = Path(__file__).resolve().parent.parent
 INDEX_FILE = ROOT / "index.html"
 ARCHIVE_DIR = ROOT / "archives" / "html-versions"
+CHANGELOG_FILE = ROOT / "CHANGELOG.md"
 
 
 def sync_index_to_latest_version(root: Path, index_path: Path):
@@ -64,14 +66,54 @@ def update_index(index_path: Path, version: str):
     return False
 
 
+def ensure_changelog_exists():
+    if not CHANGELOG_FILE.exists():
+        CHANGELOG_FILE.write_text(
+            "# Changelog\n\nAll notable changes to this project will be documented in this file.\n\n",
+            encoding="utf-8",
+        )
+
+
+def changelog_contains_version(version: str):
+    text = CHANGELOG_FILE.read_text(encoding="utf-8")
+    return re.search(rf"^## \[{re.escape(version)}\]", text, flags=re.MULTILINE) is not None
+
+
+def append_changelog_entry(version: str):
+    ensure_changelog_exists()
+    if changelog_contains_version(version):
+        return False
+
+    today = date.today().isoformat()
+    section = (
+        f"## [{version}] - {today}\n"
+        "### Added\n"
+        "- Describe changes for this version.\n\n"
+        "### Changed\n"
+        "- \n\n"
+        "### Fixed\n"
+        "- \n\n"
+    )
+    text = CHANGELOG_FILE.read_text(encoding="utf-8")
+    CHANGELOG_FILE.write_text(text + section, encoding="utf-8")
+    return True
+
+
 def main():
     changed, version = sync_index_to_latest_version(ROOT, INDEX_FILE)
     if version is None:
         print("Tidak ditemukan file versi yang sesuai.")
         return 1
 
+    version_number = version[1:] if version.startswith('v') else version
+    changelog_changed = append_changelog_entry(version_number)
+
     print(f"Versi terbaru: {version}")
     print("index.html diperbarui." if changed else "index.html sudah menggunakan versi terbaru.")
+    if changelog_changed:
+        print(f"CHANGELOG.md diperbarui dengan entri versi {version_number}.")
+    else:
+        print(f"CHANGELOG.md sudah berisi entri versi {version_number}.")
     return 0
 
 
