@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>SVS Championship — Kalkulator Skor v3.4</title>
+<title>SVS Championship — Kalkulator Skor v9.4.1</title>
 <style>
   :root {
     --gold: #E8B84B; --gold-light: #F5E6C4;
@@ -615,6 +615,7 @@
           <option value="kill" data-i18n="trend_avg_kill">Rata-rata Kill</option>
           <option value="damage" data-i18n="trend_avg_damage">Rata-rata Damage</option>
         </select>
+        <button id="history-debug-btn" class="history-chart-select" style="min-width:unset;padding:6px 8px;margin-left:8px;font-size:12px;" onclick="seedHistorySample()">Debug</button>
       </div>
       <div id="history-chart" class="history-chart"></div>
     </div>
@@ -624,7 +625,7 @@
     <div id="history-player-list"><div class="empty-state" data-i18n="empty_state">Belum ada data tersimpan.</div></div>
   </div>
 
-  <footer>SVARGA SYNERGY E-SPORTS &middot; SVS CHAMPIONSHIP &middot; V3.4</footer>
+  <footer>SVARGA SYNERGY E-SPORTS &middot; SVS CHAMPIONSHIP &middot; V9.4.1</footer>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1341,6 +1342,24 @@ function showToast(msg, color='#1D7A5A') {
   t.textContent = msg; t.style.background = color;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Inject sample history data (debug helper)
+function seedHistorySample() {
+  const now = Date.now();
+  const sample = [
+    { team: 'Team Alpha', match: 1, players: [
+      { name: 'Alice', role: 'exp', total: 12.4, breakdown: { bKill:4,bDeath:-1,bAssist:2,bDmgDealt:5,bDmgTaken:1,bTurret:1,bTfp:1 } },
+      { name: 'Bob', role: 'gold', total: 9.8, breakdown: { bKill:3,bDeath:-2,bAssist:1,bDmgDealt:4,bDmgTaken:0,bTurret:1,bTfp:0 } }
+    ], total: 22.2, ts: now },
+    { team: 'Team Beta', match: 2, players: [
+      { name: 'Carol', role: 'mid', total: 14.1, breakdown: { bKill:5,bDeath:-1,bAssist:3,bDmgDealt:7,bDmgTaken:0,bTurret:0,bTfp:2 } },
+      { name: 'Dave', role: 'jungler', total: 8.6, breakdown: { bKill:2,bDeath:-2,bAssist:1,bDmgDealt:2,bDmgTaken:3,bTurret:0,bTfp:0 } }
+    ], total: 22.7, ts: now+1 }
+  ];
+  localStorage.setItem('svs_history', JSON.stringify(sample));
+  showToast('Sample history injected');
+  renderHistory();
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────

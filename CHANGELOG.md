@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [9.4.1] - 2026-08-02
+### Added
+- Update public page version to `v9.4.1` in `index.html`.
+
+### Changed
+- Minor fixes and developer helper added (history debug button).
+
 ## [3.4] - 2026-08-02
 ### Added
 - Simple match history trend chart for per-match metrics in the history tab.
