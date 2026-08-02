@@ -2,9 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
-## [9.4.1] - 2026-08-02
+## [9.4.2] - 2026-08-02
 ### Added
-- Update public page version to `v9.4.1` in `index.html`.
+- Update public page version to `v9.4.2` in `index.html`.
 
 ### Changed
 - Minor fixes and developer helper added (history debug button).
