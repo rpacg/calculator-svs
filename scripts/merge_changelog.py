@@ -13,7 +13,6 @@ It is idempotent and keeps the rest of CHANGELOG.md intact.
 """
 import re
 import pathlib
-from packaging.version import Version, InvalidVersion
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 ARCHIVE_DIR = ROOT / 'archives' / 'update-logs'
@@ -24,14 +23,15 @@ END_SNIPPET = 'All archived update logs have been consolidated above;'
 
 
 def parse_version_from_filename(name: str):
-    # Expect formats like v9.3.23-update-log.md or v9.3.23.md
-    m = re.search(r'v?(\d+\.\d+(?:\.\d+)?)', name)
+    # Simple parser: extract numeric parts like 9.3.23 and return tuple (9,3,23)
+    m = re.search(r'v?(\d+)(?:\.(\d+))?(?:\.(\d+))?', name)
     if not m:
         return None
-    try:
-        return Version(m.group(1))
-    except InvalidVersion:
-        return None
+    parts = [int(p) if p else 0 for p in m.groups()]
+    # normalize to 3-length tuple
+    while len(parts) < 3:
+        parts.append(0)
+    return tuple(parts)
 
 
 def build_consolidated_section():
